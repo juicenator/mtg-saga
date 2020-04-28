@@ -1,6 +1,21 @@
 import Card from './Card';
 
-const punctRE = /[\u2000-\u206F\u2E00-\u2E7F\\'!"#$%&()*+,\-.\/:;<=>?@\[\]^_`{|}~]/g;
+const punctRE = /[\u2000-\u206F\u2E00-\u2E7F\\'!"#$%&()*+,\-./:;<=>?@[\]^_`{|}~]/g;
+const DEFAULT_RESPONSE = "";
+
+
+const delay = (ms: number) =>
+    new Promise(resolve => {
+        setTimeout(resolve, ms);
+    });
+
+function iterateSerialAsync(array: Promise<any>[], ms: number) {
+    let delayT = 0
+    return array.map(function (p, index) {
+        delayT += ms;
+        return delay(delayT).then(() => p);
+    });
+}
 
 function getDeckRepresentation(additional: boolean): any {
     return {
@@ -34,7 +49,7 @@ function getName(line: string) {
     // Starts with number
     if (line.match(/^\d/)) {
         let separated = line.split(" ");
-        return separated.slice(1, ).join(" ");
+        return separated.slice(1,).join(" ");
     }
     return line;
 }
@@ -48,7 +63,7 @@ async function performQueries(promises: any[]) {
 
 function getCardObject(id: number, name: string): any {
     return {
-        "CardID": id * 100,
+        "CardID": id,
         "Name": "Card",
         "Nickname": name,
         "Transform": {
@@ -68,6 +83,11 @@ function getCardObject(id: number, name: string): any {
 async function download(form: any) {
     let commander = form.commander;
     let decklist = form.decklist.split("\n");
+    // console.log(commander);
+    // console.log(decklist);
+    if (commander === "" && form.decklist === "") {
+        return DEFAULT_RESPONSE;
+    }
     let promises: any[] = [];
     let cards: any[] = [];
     let mainDeck = getDeckRepresentation(false);
@@ -87,17 +107,17 @@ async function download(form: any) {
 
     // Add commander if present
     if (commander !== "") {
-        let tmpCommander = ""+commander;
+        let tmpCommander = "" + commander;
         tmpCommander = tmpCommander.toLowerCase();
         tmpCommander = tmpCommander.replace(punctRE, '');
 
         // See if commander already present in list
         let alreadyPresent = false;
-        cards.forEach((c:any) => {
+        cards.forEach((c: any) => {
             if (alreadyPresent) {
                 return;
             }
-            let tmpStripped = ""+c.name;
+            let tmpStripped = "" + c.name;
             tmpStripped = tmpStripped.replace(punctRE, '');
             tmpStripped = tmpStripped.toLowerCase();
             if (tmpStripped === tmpCommander) {
@@ -114,6 +134,7 @@ async function download(form: any) {
     }
 
     // collect
+    // await iterateSerialAsync(promises, 1000)
     await performQueries(promises);
 
     // Postprocess tokens, flip and additional cards
@@ -125,7 +146,7 @@ async function download(form: any) {
                 let tmpCard = new Card("", 1, true);
                 tmpCard.setUri(token);
                 cards.push(tmpCard);
-                postPromises.push(tmpCard.getCardPromise())
+                postPromises.push(tmpCard.getCardPromise());
             })
         }
         // Handle flip cards
@@ -140,6 +161,17 @@ async function download(form: any) {
     // collect
     await performQueries(postPromises);
 
+    // Error building
+    let errors: string[] = [];
+    cards.forEach((card: any) => {
+        if (card.failed) {
+            errors.push(card.name);
+        }
+    });
+    if (errors.length > 0) {
+        return errors.join("\n")
+    }
+
     // Build JSON structure
     console.log("Building JSON")
 
@@ -149,12 +181,13 @@ async function download(form: any) {
     cards.filter((c) => {
         return !c.additional
     }).forEach((card: any) => {
-        for(let i = 0; i < card.num_instances; i++) {
+        for (let i = 0; i < card.num_instances; i++) {
+            let tmpCardId = cardId * 100;
             // register card ID
-            mainDeck.DeckIDs.push(cardId * 100);
+            mainDeck.DeckIDs.push(tmpCardId);
 
             // register card object
-            mainDeck.ContainedObjects.push(getCardObject(cardId, card.name))
+            mainDeck.ContainedObjects.push(getCardObject(tmpCardId, card.name))
 
             // register card visual object
             mainDeck.CustomDeck[String(cardId)] = card.getTabletopCard();
@@ -168,7 +201,7 @@ async function download(form: any) {
     cards.filter((c) => {
         return c.additional;
     }).forEach((card: any) => {
-        for(let i = 0; i < card.num_instances; i++) {
+        for (let i = 0; i < card.num_instances; i++) {
             let tmpId = additionalId * 100 + 1;
             // register card ID
             additionalDeck.DeckIDs.push(tmpId);
@@ -190,18 +223,37 @@ async function download(form: any) {
             mainDeck
         ]
     }
-    if(additionalId > 1) {
+    // Padding
+    if (cardId > 1) {
+        if (mainDeck.DeckIDs.length === 1) {
+            let tmpId = cardId * 100 + 9;
+            let tmpCard = new Card("Padding", 1, false);
+            mainDeck.DeckIDs.unshift(tmpId)
+            mainDeck.ContainedObjects.unshift(getCardObject(tmpId, tmpCard.name))
+            mainDeck.CustomDeck[String(tmpId)] = tmpCard.getTabletopCard();
+        }
+        Output.ObjectStates = [mainDeck];
+    }
+    if (additionalId > 1) {
+        if (additionalDeck.DeckIDs.length === 1) {
+            let tmpId = additionalId * 100 + 1;
+            let tmpCard = new Card("Padding", 1, false);
+            additionalDeck.DeckIDs.unshift(tmpId);
+            additionalDeck.ContainedObjects.unshift(getCardObject(tmpId, tmpCard.name));
+            additionalDeck.CustomDeck[String(tmpId)] = tmpCard.getTabletopCard();
+        }
         Output.ObjectStates.push(additionalDeck);
     }
+
 
     // Download prompt
     var jsonse = JSON.stringify(Output);
     var blob = new Blob([jsonse], {type: "application/json"});
-    var url  = URL.createObjectURL(blob);
+    var url = URL.createObjectURL(blob);
     var a = document.createElement('a');
     let fileName = "";
     if (commander !== "") {
-        fileName = commander +".json";
+        fileName = commander + ".json";
     } else {
         fileName = cards[0].name + ".json";
     }
@@ -214,6 +266,7 @@ async function download(form: any) {
     //Cleanup
     window.URL.revokeObjectURL(url);
     document.body.removeChild(a);
+    return DEFAULT_RESPONSE;
 }
 
 export default download

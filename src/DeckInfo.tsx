@@ -15,6 +15,7 @@ export default function InfoForm() {
     const classes = useStyles();
     const [form, setForm] = useState({"commander": "", "decklist": ""});
     const [disabled, setDisabled] = useState(false);
+    const [errors, setErrors] = useState("");
 
     return (
         <Grid container spacing={1}>
@@ -110,15 +111,43 @@ export default function InfoForm() {
                         color="primary"
                         onClick={async function () {
                             setDisabled(true);
-                            await download(form);
+                            let e = await download(form);
+                            if (e !== "") {
+                                setErrors(e);
+                            }
                             setDisabled(false);
                         }}
                         aria-label="download tabletop JSON"
-                        disabled={disabled}
+                        disabled={disabled || (form.commander === "" && form.decklist === "")}
                     >
                         Download Tabletop Simulator file
                     </Button>
+                    <Grid item xs={12}>
+                    <Typography
+                    variant={"caption"}>
+                        Downloading may take a couple of seconds.
+                    </Typography>
+                    </Grid>
                 </Grid>
+            </Grid>
+
+            {/*Error display*/}
+            <Grid item xs={12} container justify="center" style={{paddingTop: "1vmin"}}>
+                {(errors === "") ? null : <TextField
+                    id="errors"
+                    name="errors"
+                    label="Failed to get the following card(s)"
+                    helperText={"Edit these in the textbox above and try again. " +
+                    "Follow the format: <number> <card name>"}
+                    value={errors}
+                    InputLabelProps={{shrink: true}}
+                    fullWidth
+                    multiline
+                    rows={6}
+                    variant={"outlined"}
+                    error
+                    disabled
+                />}
             </Grid>
         </Grid>
     );

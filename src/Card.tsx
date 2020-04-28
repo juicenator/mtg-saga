@@ -1,5 +1,5 @@
 const SCRYFALL_CARD_BACK_IMAGE_URL = "https://img.scryfall.com/errors/missing.jpg";
-const SCRYFALL_API_URL = "http://api.scryfall.com/cards/named?fuzzy=";
+const SCRYFALL_API_URL = "https://api.scryfall.com/cards/named?fuzzy=";
 
 export default class Card {
     name: string;
@@ -11,6 +11,7 @@ export default class Card {
     query: string;
     uri: string;
     tokens: string[];
+    failed: boolean;
 
     constructor(name: string, num_instances: number, additional: boolean) {
         this.name = name;
@@ -22,6 +23,7 @@ export default class Card {
         this.uri = "";
         this.tokens = [];
         this.flip = false;
+        this.failed = false;
     }
 
     setFrontUrl(url: string) {
@@ -41,6 +43,13 @@ export default class Card {
     }
 
     parseResults(body: any) {
+        // handle failure
+        if (!body.name) {
+            this.failed = true;
+            return;
+        }
+        this.name = body.name;
+
         // if split card
         if (body.card_faces && body.image_uris) {
             this.setFrontUrl(body.image_uris.normal);
@@ -66,19 +75,29 @@ export default class Card {
                this.tokens.push(c.uri);
             });
         }
-        this.name = body.name;
     }
 
-    getCardPromise(): any {
+    async getCardPromise() {
         // if uri, do not query but directly get from uri
         let query = this.uri ? this.uri : this.query;
-        return window.fetch(query).then((y: any) => {
-            return y.text().then((res: any) => {
-                // console.log(res);
-                let parsed = JSON.parse(res);
-                this.parseResults(parsed);
-            })
-        });
+        try {
+            const res = await window.fetch(query);
+            const json = await res.json();
+            this.parseResults(json);
+        } catch (err) {
+            console.log("ER1: Failed to get: "+this.name)
+            this.failed = true;
+        }
+
+
+        // return window.fetch(query).then((response: any) => {
+        //     return response.json().then((res: any) => {
+        //         this.parseResults(res);
+        //     })
+        // }).catch((err:any) => {
+        //     console.log("ER1: Failed to get: "+this.name)
+        //     this.failed = true;
+        // })
     }
 
     getTabletopCard(): any {
