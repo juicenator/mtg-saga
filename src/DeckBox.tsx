@@ -1,5 +1,7 @@
 import Card from './Card';
 
+const punctRE = /[\u2000-\u206F\u2E00-\u2E7F\\'!"#$%&()*+,\-.\/:;<=>?@\[\]^_`{|}~]/g;
+
 function getDeckRepresentation(additional: boolean): any {
     return {
         "Name": "DeckCustom",
@@ -71,12 +73,6 @@ async function download(form: any) {
     let mainDeck = getDeckRepresentation(false);
     let additionalDeck = getDeckRepresentation(true);
 
-    // Add commander if present
-    if (commander !== "") {
-        let tmpCard = new Card(commander, 1, true)
-        cards.push(tmpCard);
-    }
-
     // Build decklist with queries
     decklist.forEach((line: string) => {
         if (line === "") {
@@ -84,10 +80,38 @@ async function download(form: any) {
         }
         let numInstances = getNumInstances(line);
         let name = getName(line);
-        let tmpCard = new Card(name, numInstances, false)
+        let tmpCard = new Card(name, numInstances, false);
         cards.push(tmpCard);
         promises.push(tmpCard.getCardPromise());
     });
+
+    // Add commander if present
+    if (commander !== "") {
+        let tmpCommander = ""+commander;
+        tmpCommander = tmpCommander.toLowerCase();
+        tmpCommander = tmpCommander.replace(punctRE, '');
+
+        // See if commander already present in list
+        let alreadyPresent = false;
+        cards.forEach((c:any) => {
+            if (alreadyPresent) {
+                return;
+            }
+            let tmpStripped = ""+c.name;
+            tmpStripped = tmpStripped.replace(punctRE, '');
+            tmpStripped = tmpStripped.toLowerCase();
+            if (tmpStripped === tmpCommander) {
+                c.additional = true;
+                c.num_instances = 1;
+                alreadyPresent = true;
+            }
+        })
+
+        if (!alreadyPresent) {
+            let tmpCard = new Card(commander, 1, true);
+            cards.push(tmpCard);
+        }
+    }
 
     // collect
     await performQueries(promises);
@@ -142,9 +166,9 @@ async function download(form: any) {
     console.log("Handle additional cards")
     let additionalId = 1;
     cards.filter((c) => {
-        return c.additional
+        return c.additional;
     }).forEach((card: any) => {
-        for(let i = 1; i < card.num_instances; i++) {
+        for(let i = 0; i < card.num_instances; i++) {
             let tmpId = additionalId * 100 + 1;
             // register card ID
             additionalDeck.DeckIDs.push(tmpId);

@@ -26,12 +26,9 @@ export default function InfoForm() {
             <Grid item xs={11}>
                 <Typography variant="h6"
                 >
-                    Optional: Enter Commander name
+                    Optional: Who is your Commander?
                 </Typography>
-                <Typography>
-                    (and do not exclude it in the decklist)
-                </Typography>
-                <Grid item xs={8} container justify="center">
+                <Grid item xs={11} container justify="center">
                     <TextField
                         id="commander"
                         name="commander"
@@ -43,8 +40,8 @@ export default function InfoForm() {
                         InputLabelProps={{shrink: true}}
                         fullWidth
                         placeholder={"Alela, Artful Provocateur"}
-                        helperText="The commander will be kept separate from the deck,
-                        so you do not have to search for it"
+                        helperText="It will be spawned next to the deck,
+                        so you don't have to search for it!"
                     />
                 </Grid>
             </Grid>
@@ -63,39 +60,42 @@ export default function InfoForm() {
                 <Typography></Typography>
                 <Grid item xs={1}>
                 </Grid>
-                <TextField
-                    id="decklist"
-                    name="decklist"
-                    label="Decklist"
-                    value={form.decklist}
-                    onChange={(e) => {
-                        setForm({...form, "decklist": e.target.value})
-                    }}
-                    InputLabelProps={{shrink: true}}
-                    placeholder={"1 Admiral's Order\n" +
-                    "1 Aether Hub\n" +
-                    "1 Anointed Procession\n" +
-                    "1 Arcanist's Owl\n" +
-                    "6 Island\n" +
-                    "...."}
-                    fullWidth
-                    multiline
-                    rows={6}
-                    variant={"outlined"}
-                />
+                <Grid item xs={12} container justify="center">
+                    <TextField
+                        id="decklist"
+                        name="decklist"
+                        label="Decklist"
+                        value={form.decklist}
+                        onChange={(e) => {
+                            setForm({...form, "decklist": e.target.value})
+                        }}
+                        InputLabelProps={{shrink: true}}
+                        placeholder={"1 Admiral's Order\n" +
+                        "1 Aether Hub\n" +
+                        "1 Anointed Procession\n" +
+                        "1 Arcanist's Owl\n" +
+                        "6 Island\n" +
+                        "...."}
+                        fullWidth
+                        multiline
+                        rows={6}
+                        variant={"outlined"}
+                    />
+                </Grid>
             </Grid>
 
             <Grid container spacing={1}>
                 <Grid item xs={1}>
                 </Grid>
                 <Grid item xs={11}>
+                    <br/>
                     Save the output file in the Tabletop Simulator folder:
-                    <pre>
+                    <pre className={"Wrap"}>
                     On windows:<br/>
                     C:\Users\YOUR_NAME\Documents\My Games\Tabletop Simulator\Saves\Saved Objects\</pre>
-                    <pre>
+                    <pre className={"Wrap"}>
                     On mac:<br/>
-                    ~/Library/Tabletop Simulator/Saves/Saved Objects</pre>
+                    ~/Library/Tabletop Simulator/Saves/Saved Objects/</pre>
                 </Grid>
             </Grid>
             <Grid container spacing={1}>
@@ -116,7 +116,7 @@ export default function InfoForm() {
                         aria-label="download tabletop JSON"
                         disabled={disabled}
                     >
-                        Download
+                        Download Tabletop Simulator file
                     </Button>
                 </Grid>
             </Grid>

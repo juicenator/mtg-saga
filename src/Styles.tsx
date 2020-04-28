@@ -3,10 +3,10 @@ import {makeStyles} from "@material-ui/core/styles";
 const useStyles = makeStyles((theme) => ({
     appBar: {
         position: 'relative',
-        "font-size": 'calc(9px + 2vmin)',
         "display": 'flex',
         "flex-direction": 'column',
-        "max-height":'7vmin',
+        "margin": 0,
+        "padding": 0,
     },
     layout: {
         width: 'auto',

@@ -12,7 +12,7 @@ import './App.css';
 
 function Copyright() {
   return (
-      <Typography variant="body2" color="textSecondary" align="center">
+      <Typography variant="caption" color="textSecondary" justify-content="center" align="center">
         {'Copyright © Anton Steenvoorden - '}
         {new Date().getFullYear()}
         {'. Made possible by '}
@@ -33,7 +33,7 @@ function App() {
         <AppBar position="absolute" color="default" className={classes.appBar}>
           <Toolbar>
             <img src="./mtgsaga.png" className="App-logo" alt="MTG Saga Logo" />
-            <Typography variant="h6" color="inherit" noWrap>
+            <Typography variant="h6" color="inherit" noWrap align={"center"}>
               MTG Saga - a Tabletop Simulator Deck Generator
             </Typography>
             <span style={{ flex: 1 }}></span>

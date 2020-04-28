@@ -4,6 +4,7 @@ body {
   background-repeat:no-repeat;
   background-size: 30%;
 }
+
 .App {
   text-align: center;
 }
@@ -19,14 +20,10 @@ body {
   margin-top:-1vmin;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-  padding-right:10vmin;
+.Wrap {
+  word-wrap: break-word;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  white-space: -o-pre-wrap;
 }
