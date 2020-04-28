@@ -29,7 +29,7 @@ function getDeckRepresentation(additional: boolean): any {
             "posZ": 0,
             "rotX": 0,
             "rotY": 180,
-            "rotZ": 180,
+            "rotZ": 0,
             "scaleX": 1,
             "scaleY": 1,
             "scaleZ": 1
@@ -83,6 +83,8 @@ function getCardObject(id: number, name: string): any {
 async function download(form: any) {
     let commander = form.commander;
     let decklist = form.decklist.split("\n");
+    let commanderIndex = -1;
+
     // console.log(commander);
     // console.log(decklist);
     if (commander === "" && form.decklist === "") {
@@ -95,9 +97,10 @@ async function download(form: any) {
 
     // Build decklist with queries
     decklist.forEach((line: string) => {
-        if (line === "") {
+        if (line === "" || line.startsWith("//")) {
             return;
         }
+        line = line.trim();
         let numInstances = getNumInstances(line);
         let name = getName(line);
         let tmpCard = new Card(name, numInstances, false);
@@ -113,7 +116,7 @@ async function download(form: any) {
 
         // See if commander already present in list
         let alreadyPresent = false;
-        cards.forEach((c: any) => {
+        cards.forEach((c: any, index:number) => {
             if (alreadyPresent) {
                 return;
             }
@@ -121,14 +124,15 @@ async function download(form: any) {
             tmpStripped = tmpStripped.replace(punctRE, '');
             tmpStripped = tmpStripped.toLowerCase();
             if (tmpStripped === tmpCommander) {
-                c.additional = true;
                 c.num_instances = 1;
                 alreadyPresent = true;
+                commanderIndex = index;
             }
         })
 
         if (!alreadyPresent) {
             let tmpCard = new Card(commander, 1, true);
+            commanderIndex = cards.length;
             cards.push(tmpCard);
         }
     }
@@ -151,7 +155,7 @@ async function download(form: any) {
         }
         // Handle flip cards
         if (r.flip) {
-            let tmpCard = {...r};
+            let tmpCard = Object.create(r);
             tmpCard.setBackUrl(""); // reset to cardback
             tmpCard.additional = false;
             cards.push(tmpCard);
@@ -179,7 +183,7 @@ async function download(form: any) {
     console.log("Handle normal cards")
     let cardId = 1;
     cards.filter((c) => {
-        return !c.additional
+        return !c.additional;
     }).forEach((card: any) => {
         for (let i = 0; i < card.num_instances; i++) {
             let tmpCardId = cardId * 100;
@@ -210,10 +214,25 @@ async function download(form: any) {
             additionalDeck.ContainedObjects.push(getCardObject(tmpId, card.name))
 
             // register card visual object
-            additionalDeck.CustomDeck[String(tmpId)] = card.getTabletopCard();
+            additionalDeck.CustomDeck[String(additionalId)] = card.getTabletopCard();
             additionalId += 1;
         }
     });
+
+    // Handle commander, put on top of stack
+    if (commanderIndex !== -1) {
+        console.log("Handle commander");
+        let tmpCard = cards[commanderIndex];
+        let tmpId = additionalId * 100 + 1;
+        // register card ID
+        additionalDeck.DeckIDs.push(tmpId);
+
+        // register card object
+        additionalDeck.ContainedObjects.push(getCardObject(tmpId, tmpCard.name));
+
+        // register card visual object
+        additionalDeck.CustomDeck[String(additionalId)] = tmpCard.getTabletopCard();
+    }
 
     // console.log(mainDeck);
     // console.log(additionalDeck);
@@ -236,7 +255,7 @@ async function download(form: any) {
     }
     if (additionalId > 1) {
         if (additionalDeck.DeckIDs.length === 1) {
-            let tmpId = additionalId * 100 + 1;
+            let tmpId = additionalId * 100 + 8;
             let tmpCard = new Card("Padding", 1, false);
             additionalDeck.DeckIDs.unshift(tmpId);
             additionalDeck.ContainedObjects.unshift(getCardObject(tmpId, tmpCard.name));
@@ -252,8 +271,8 @@ async function download(form: any) {
     var url = URL.createObjectURL(blob);
     var a = document.createElement('a');
     let fileName = "";
-    if (commander !== "") {
-        fileName = commander + ".json";
+    if (commanderIndex !== -1) {
+        fileName = cards[commanderIndex].name + ".json";
     } else {
         fileName = cards[0].name + ".json";
     }
