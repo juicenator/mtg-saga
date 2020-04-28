@@ -32,7 +32,7 @@ function getName(line: string) {
     // Starts with number
     if (line.match(/^\d/)) {
         let separated = line.split(" ");
-        return separated.slice(1, -1).join(" ");
+        return separated.slice(1, ).join(" ");
     }
     return line;
 }
@@ -125,15 +125,17 @@ async function download(form: any) {
     cards.filter((c) => {
         return !c.additional
     }).forEach((card: any) => {
-        // register card ID
-        mainDeck.DeckIDs.push(cardId * 100);
+        for(let i = 0; i < card.num_instances; i++) {
+            // register card ID
+            mainDeck.DeckIDs.push(cardId * 100);
 
-        // register card object
-        mainDeck.ContainedObjects.push(getCardObject(cardId, card.name))
+            // register card object
+            mainDeck.ContainedObjects.push(getCardObject(cardId, card.name))
 
-        // register card visual object
-        mainDeck.CustomDeck[String(cardId)] = card.getTabletopCard();
-        cardId += 1;
+            // register card visual object
+            mainDeck.CustomDeck[String(cardId)] = card.getTabletopCard();
+            cardId += 1;
+        }
     });
 
     //Handle additional cards
@@ -142,17 +144,23 @@ async function download(form: any) {
     cards.filter((c) => {
         return c.additional
     }).forEach((card: any) => {
-        let tmpId = additionalId * 100 + 1;
-        // register card ID
-        additionalDeck.DeckIDs.push(tmpId);
+        for(let i = 1; i < card.num_instances; i++) {
+            let tmpId = additionalId * 100 + 1;
+            // register card ID
+            additionalDeck.DeckIDs.push(tmpId);
 
-        // register card object
-        additionalDeck.ContainedObjects.push(getCardObject(tmpId, card.name))
+            // register card object
+            additionalDeck.ContainedObjects.push(getCardObject(tmpId, card.name))
 
-        // register card visual object
-        additionalDeck.CustomDeck[String(tmpId)] = card.getTabletopCard();
-        additionalId += 1;
-    })
+            // register card visual object
+            additionalDeck.CustomDeck[String(tmpId)] = card.getTabletopCard();
+            additionalId += 1;
+        }
+    });
+
+    // console.log(mainDeck);
+    // console.log(additionalDeck);
+
     let Output = {
         "ObjectStates": [
             mainDeck

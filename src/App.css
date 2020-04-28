@@ -1,5 +1,5 @@
 body {
-  background-image:url("mtg.svg");
+  background-image:url("images/mtg.svg");
   background-position:bottom right;
   background-repeat:no-repeat;
   background-size: 30%;
@@ -11,6 +11,12 @@ body {
 .App-logo {
   height: 3vmin;
   pointer-events: none;
+}
+
+.Step {
+  object-fit: cover;
+  height: 6vmin;
+  margin-top:-1vmin;
 }
 
 .App-header {
