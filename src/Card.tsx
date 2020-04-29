@@ -1,31 +1,32 @@
+import {CardType, TabletopCard, TabletopObject} from './Tabletop';
+
 const SCRYFALL_CARD_BACK_IMAGE_URL = "https://img.scryfall.com/errors/missing.jpg";
 const SCRYFALL_API_URL = "https://api.scryfall.com/cards/named?fuzzy=";
+
 
 export default class Card {
     name: string;
     num_instances: number;
-    additional: boolean;
-    flip: boolean;
+    cardType: CardType;
     back_url: string;
     front_url: string;
     query: string;
     uri: string;
     tokens: string[];
     failed: boolean;
-    commander: boolean;
+    id: number;
 
-    constructor(name: string, num_instances: number, additional: boolean) {
+    constructor(name: string, num_instances: number, type: CardType) {
         this.name = name;
         this.num_instances = num_instances;
-        this.additional = additional;
+        this.cardType = type;
         this.back_url = SCRYFALL_CARD_BACK_IMAGE_URL;
         this.front_url = SCRYFALL_CARD_BACK_IMAGE_URL;
         this.query = SCRYFALL_API_URL + '"' + name + '"';
         this.uri = "";
         this.tokens = [];
-        this.flip = false;
         this.failed = false;
-        this.commander = false;
+        this.id = -1;
     }
 
     setFrontUrl(url: string) {
@@ -44,6 +45,13 @@ export default class Card {
         this.uri = uri;
     }
 
+    setType(cardType: CardType) {
+        this.cardType = cardType;
+    }
+    setId(id: number) {
+        this.id = id;
+    }
+    
     parseResults(body: any) {
         // handle failure
         if (!body.name) {
@@ -52,7 +60,7 @@ export default class Card {
         }
         this.name = body.name;
 
-        // if split card
+        // if split card, do not use the card_faces but just the normal one
         if (body.card_faces && body.image_uris) {
             this.setFrontUrl(body.image_uris.normal);
         }
@@ -60,8 +68,7 @@ export default class Card {
         if (body.card_faces && !body.image_uris){
             this.setFrontUrl(body.card_faces[0].image_uris.normal);
             this.setBackUrl(body.card_faces[1].image_uris.normal);
-            this.flip = true;
-            this.additional = true;
+            this.cardType = CardType.Flip
         }
         // if normal card
         if(body.image_uris){
@@ -96,13 +103,35 @@ export default class Card {
         }
     }
 
-    getTabletopCard(): any {
+    getTabletopCard(): TabletopCard {
         return {
             "FaceURL": this.front_url,
             "BackURL": this.back_url,
             "NumHeight": 1,
             "NumWidth": 1,
-            "BackIsHidden": !this.flip
+            "BackIsHidden": !(this.cardType === CardType.Flip)
+        }
+    }
+
+    getCardObject(): TabletopObject {
+        if (this.id === -1) {
+            throw "This card is invalid "+ this.name
+        }
+        return {
+            "CardID": this.id,
+            "Name": "Card",
+            "Nickname": this.name,
+            "Transform": {
+                "posX": 0,
+                "posY": 0,
+                "posZ": 0,
+                "rotX": 0,
+                "rotY": 180,
+                "rotZ": 180,
+                "scaleX": 1,
+                "scaleY": 1,
+                "scaleZ": 1,
+            }
         }
     }
 }

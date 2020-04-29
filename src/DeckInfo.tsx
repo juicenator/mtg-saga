@@ -27,7 +27,7 @@ export default function InfoForm() {
             <Grid item xs={11}>
                 <Typography variant="h6"
                 >
-                    Optional: Who is your Commander?
+                    Optional: List your Commander(s)
                 </Typography>
                 <Grid item xs={11} container justify="center">
                     <TextField
@@ -40,9 +40,11 @@ export default function InfoForm() {
                         }}
                         InputLabelProps={{shrink: true}}
                         fullWidth
-                        placeholder={"Alela, Artful Provocateur"}
-                        helperText="It will be spawned next to the deck,
-                        so you don't have to search for it!"
+                        multiline
+                        rows={2}
+                        placeholder={"Alela, Artful Provocateur\n"+"A commander companion"}
+                        helperText="They will be spawned next to the deck,
+                        so you don't have to search!"
                     />
                 </Grid>
             </Grid>
