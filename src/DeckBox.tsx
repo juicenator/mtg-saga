@@ -125,6 +125,8 @@ async function download(form: any) {
             tmpStripped = tmpStripped.toLowerCase();
             if (tmpStripped === tmpCommander) {
                 c.num_instances = 1;
+                c.additional = true;
+                c.commander = true;
                 alreadyPresent = true;
                 commanderIndex = index;
             }
@@ -203,7 +205,7 @@ async function download(form: any) {
     console.log("Handle additional cards")
     let additionalId = 1;
     cards.filter((c) => {
-        return c.additional;
+        return c.additional && !c.commander;
     }).forEach((card: any) => {
         for (let i = 0; i < card.num_instances; i++) {
             let tmpId = additionalId * 100 + 1;

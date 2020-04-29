@@ -12,6 +12,7 @@ export default class Card {
     uri: string;
     tokens: string[];
     failed: boolean;
+    commander: boolean;
 
     constructor(name: string, num_instances: number, additional: boolean) {
         this.name = name;
@@ -24,6 +25,7 @@ export default class Card {
         this.tokens = [];
         this.flip = false;
         this.failed = false;
+        this.commander = false;
     }
 
     setFrontUrl(url: string) {
@@ -72,6 +74,10 @@ export default class Card {
                if (c.name === body.name) {
                    return;
                }
+               // If this is e.g. a partner card
+               if (c.component === "combo_piece") {
+                   return;
+               }
                this.tokens.push(c.uri);
             });
         }
@@ -88,16 +94,6 @@ export default class Card {
             console.log("ER1: Failed to get: "+this.name)
             this.failed = true;
         }
-
-
-        // return window.fetch(query).then((response: any) => {
-        //     return response.json().then((res: any) => {
-        //         this.parseResults(res);
-        //     })
-        // }).catch((err:any) => {
-        //     console.log("ER1: Failed to get: "+this.name)
-        //     this.failed = true;
-        // })
     }
 
     getTabletopCard(): any {
