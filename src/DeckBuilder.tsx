@@ -1,7 +1,7 @@
 import Card from './Card';
 import { CardType, generateTabletopOutput } from './Tabletop';
 
-const punctRE = /[\u2000-\u206F\u2E00-\u2E7F\\'!"#$%&()*+,\-./:;<=>?@[\]^_`{|}~]/g;
+const punctRE = /[\\'!"#$%&()*+,\-.:;<=>?@[\]^_`{|}~]/g;
 const DEFAULT_RESPONSE = "";
 
 
@@ -92,8 +92,12 @@ async function getDeckFromURL(url:string) : Promise<string[]> {
             if (isNaN(numInstances)) {
                 continue;
             }            
-            // remove set tag
-            card = card.split(" ").splice(1).join(" ");
+            if(card.includes('[')){
+                // remove set tag
+                let tmpCard = card.split(" ")
+                tmpCard.splice(1, 1)
+                card = tmpCard.join(" ");
+            }
             deck.push(card);
        }
     }
