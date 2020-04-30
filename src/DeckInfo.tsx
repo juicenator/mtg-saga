@@ -78,9 +78,11 @@ export default function InfoForm() {
                 <Typography variant="h6"
                     className={classes.heading}
                 >
-                    Paste a decklist {/* or mtggoldfish url below */}
+                    Paste a decklist
                 </Typography>
-                <Typography></Typography>
+                <Typography variant="caption">
+                        You can also directly paste a URL to a deck from: mtggoldfish, deckstats.
+                </Typography>
                 <Grid item xs={1}>
                 </Grid>
                 <Grid item xs={12} container justify="center">
@@ -93,10 +95,10 @@ export default function InfoForm() {
                             setForm({ ...form, "decklist": e.target.value })
                         }}
                         InputLabelProps={{ shrink: true }}
-                        placeholder={"1 Admiral's Order\n" +
+                        placeholder={"https://www.mtggoldfish.com/deck/1234567\n" +
+                            "OR\n"+
                             "1 Aether Hub\n" +
                             "1 Anointed Procession\n" +
-                            "1 Arcanist's Owl\n" +
                             "6 Island\n" +
                             "...."}
                         fullWidth

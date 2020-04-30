@@ -52,16 +52,27 @@ const createDeckstatsUrl = (url:string) => {
     return deckUrl.toString();
 }
 
+async function getProxyUrl(url:string): Promise<string> {
+    const res = await window.fetch('/proxy.php', {
+        headers: {
+            'X-Proxy-URL': url
+        }
+    })
+    const deckFromUrl = await res.text();
+    return deckFromUrl;
+}
+
 
 async function getDeckFromURL(url:string) : Promise<string[]> {
     let deck:string[] = [""];
     if (url.includes(MTGGOLDFISH)) {
         let deckUrl = createGoldfishUrl(url);
-        let deckFromUrl = await window.fetch(deckUrl).then((y) => {return y.text()});
+        let deckFromUrl = await getProxyUrl(deckUrl);
+        console.log(deckFromUrl);
         deck = deckFromUrl.split("\n");        
     } else if (url.includes(DECKSTATS)) {
         let deckUrl = createDeckstatsUrl(url);
-        let deckFromUrl = await window.fetch(deckUrl).then((y) => {return y.text()});
+        let deckFromUrl = await getProxyUrl(deckUrl);
        /*
         Main
         1 Kelsien, the Plague # !Commander
@@ -72,6 +83,10 @@ async function getDeckFromURL(url:string) : Promise<string[]> {
 
         */
        for(let card of deckFromUrl.split("\n")) {
+            // skip if empty line
+            if(card === "") {
+                continue;
+            }
             // skip if no number
             let numInstances = Number(card.split(" ")[0])
             if (isNaN(numInstances)) {
@@ -108,10 +123,9 @@ async function download(form: any): Promise<string> {
     
     let decklist: string[] = decklistForm.split("\n");
     // Handle URLs
-    // if (isValidHttpUrl(decklist[0])) {
-        // decklist = await getDeckFromURL(decklist[0]);
-    // }
-
+    if (isValidHttpUrl(decklist[0])) {
+        decklist = await getDeckFromURL(decklist[0]);
+    }
 
     let hasCommander = commander !== "";
     if (partner !== "") {
@@ -162,8 +176,6 @@ async function download(form: any): Promise<string> {
             promises.push(tmpCard.getCardPromise());
         })
     }
-
-    console.log(cards);
 
     // collect
     await performQueries(promises);
