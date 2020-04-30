@@ -8,7 +8,7 @@ const DEFAULT_RESPONSE = "";
 function getNumInstances(line: string) {
     let numInstances = Number(line.split(" ")[0])
     if (isNaN(numInstances)) {
-        return 1
+        return 1;
     }
     return numInstances;
 }
@@ -17,40 +17,109 @@ function getName(line: string) {
     // Starts with number
     if (line.match(/^\d/)) {
         let separated = line.split(" ");
-        return separated.slice(1).join(" ");
+        return separated.slice(1).join(" ").trim().toLowerCase().replace(punctRE, '');
     }
     return line;
 }
 
+// Perhaps build in a delay here to prevent Scryfall from overloading.
 async function performQueries(promises: any[]) {
-    return Promise.all(promises).then(results => {
-        // do something with results.
-        console.log("Done");
-    });
+    return Promise.all(promises);
 }
 
 function compareToCommanders(commanders: string[], cardName: string) {
     let isEqual = false;
     for(let commander of commanders) {
-        if (commander === cardName.trim().toLowerCase().replace(punctRE, '')) {
+        if (commander === cardName) {
             isEqual = true;
         }
     };
     return isEqual;
 }
 
+const NUMBER_PATTERN = /\d+/g;
+const MTGGOLDFISH = "mtggoldfish";
+const createGoldfishUrl = (url:string) => {
+    let deckId = url.match(NUMBER_PATTERN);
+    let extractedId = deckId?.join('');
+    return "https://www.mtggoldfish.com/deck/download/"+extractedId;
+}
+
+const DECKSTATS = "deckstats";
+const createDeckstatsUrl = (url:string) => {
+    var deckUrl = new URL(url);
+    deckUrl.searchParams.set('export_txt', "1");
+    return deckUrl.toString();
+}
+
+
+async function getDeckFromURL(url:string) : Promise<string[]> {
+    let deck:string[] = [""];
+    if (url.includes(MTGGOLDFISH)) {
+        let deckUrl = createGoldfishUrl(url);
+        let deckFromUrl = await window.fetch(deckUrl).then((y) => {return y.text()});
+        deck = deckFromUrl.split("\n");        
+    } else if (url.includes(DECKSTATS)) {
+        let deckUrl = createDeckstatsUrl(url);
+        let deckFromUrl = await window.fetch(deckUrl).then((y) => {return y.text()});
+       /*
+        Main
+        1 Kelsien, the Plague # !Commander
+        1 [KLD] Demolition Stomper
+
+        Some others
+        1 [KLD] Metalwork Colossus 
+
+        */
+       for(let card of deckFromUrl.split("\n")) {
+            // skip if no number
+            let numInstances = Number(card.split(" ")[0])
+            if (isNaN(numInstances)) {
+                continue;
+            }            
+            // remove set tag
+            card = card.split(" ").splice(1).join(" ");
+            deck.push(card);
+       }
+    }
+    return deck;
+}
+
+function isValidHttpUrl(str:string): boolean {
+    let url;
+  
+    try {
+      url = new URL(str);
+    } catch (_) {
+      return false;  
+    }
+  
+    return url.protocol === "http:" || url.protocol === "https:";
+  }
+
 async function download(form: any): Promise<string> {
     let commander: string = form.commander;
-    let decklist: string[] = form.decklist.split("\n");
+    let partner: string = form.partner;
+    let decklistForm: string = form.decklist;
 
-    if (commander === "" && form.decklist === "") {
+    if (commander === "" && decklistForm === "") {
         return DEFAULT_RESPONSE;
     }
+    
+    let decklist: string[] = decklistForm.split("\n");
+    // Handle URLs
+    // if (isValidHttpUrl(decklist[0])) {
+        // decklist = await getDeckFromURL(decklist[0]);
+    // }
+
 
     let hasCommander = commander !== "";
+    if (partner !== "") {
+        commander += "\n"+partner;
+    }
     let commanders = commander.split("\n")
         .filter((c: string) => { return c.trim() !== "" })
-        .map((c: string) => { return getName(c).trim().toLowerCase().replace(punctRE, '') });
+        .map((c: string) => { return getName(c)});
 
     let commanderIndices: number[] = [];
 
