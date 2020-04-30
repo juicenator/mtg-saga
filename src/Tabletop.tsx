@@ -109,11 +109,16 @@ export function generateTabletopOutput(cards: Card[], hasAdditional:boolean, has
 
     deckTypes.forEach((deckType) => {
         console.log("Handle deck type: " + deckType);
-        if (!(deckType in cardIds)) cardIds[deckType] = 1;
+        // initialise card id
+        if (!(deckType in cardIds)) {
+            cardIds[deckType] = 1;
+        }
+        // select cards from one of the decktypes
         cards.filter((c) => {
             return (c.cardType.toString() === deckType);
-        }).forEach((card: any) => {
-            for (let i = 0; i < card.num_instances; i++) {
+        }).forEach((card: Card) => {
+            // insert multiple copies of a card
+            for (let i = 0; i < card.numInstances; i++) {
                 let tmpCardId = cardIds[deckType] * 100 + cardOffsets;
                 card.setId(tmpCardId);
 
@@ -133,10 +138,10 @@ export function generateTabletopOutput(cards: Card[], hasAdditional:boolean, has
         if (cardIds[deckType] <= 1) {
             let tmpCardId = cardIds[deckType] * 100 + cardOffsets;
             let tmpCard = new Card("Padding", 1, CardType.Default);
+            tmpCard.setId(tmpCardId);
             deckBoxes[deckType].DeckIDs.push(tmpCardId);
             deckBoxes[deckType].ContainedObjects.push(tmpCard.getCardObject());
             deckBoxes[deckType].CustomDeck[String(cardIds[deckType])] = tmpCard.getTabletopCard();
-            tmpCard.setId(tmpCardId);
         }
         // Offset for different stack ids
         cardOffsets += 1;

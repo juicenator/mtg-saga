@@ -3,22 +3,26 @@ import {CardType, TabletopCard, TabletopObject} from './Tabletop';
 const SCRYFALL_CARD_BACK_IMAGE_URL = "https://img.scryfall.com/errors/missing.jpg";
 const SCRYFALL_API_URL = "https://api.scryfall.com/cards/named?fuzzy=";
 
+type Token = {
+    name: string,
+    uri: string
+}
 
 export default class Card {
     name: string;
-    num_instances: number;
+    numInstances: number;
     cardType: CardType;
     back_url: string;
     front_url: string;
     query: string;
     uri: string;
-    tokens: string[];
+    tokens: Token[];
     failed: boolean;
     id: number;
 
     constructor(name: string, num_instances: number, type: CardType) {
         this.name = name;
-        this.num_instances = num_instances;
+        this.numInstances = num_instances;
         this.cardType = type;
         this.back_url = SCRYFALL_CARD_BACK_IMAGE_URL;
         this.front_url = SCRYFALL_CARD_BACK_IMAGE_URL;
@@ -45,11 +49,16 @@ export default class Card {
         this.uri = uri;
     }
 
-    setType(cardType: CardType) {
+    setCardType(cardType: CardType) {
         this.cardType = cardType;
     }
+
     setId(id: number) {
         this.id = id;
+    }
+    
+    setNumInstances(num: number) {
+        this.numInstances = num;
     }
     
     parseResults(body: any) {
@@ -85,7 +94,10 @@ export default class Card {
                if (c.component === "combo_piece") {
                    return;
                }
-               this.tokens.push(c.uri);
+               this.tokens.push({
+                   "name": c.name,
+                   "uri": c.uri
+                });
             });
         }
     }

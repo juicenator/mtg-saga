@@ -1,131 +1,33 @@
 import Card from './Card';
 import { CardType, generateTabletopOutput } from './Tabletop';
+import { getDeckFromURL, isValidHttpUrl } from './DeckURL';
+import { getName, getNumInstances, compareToCommanders, downloadPrompt } from './Utils';
 
-const punctRE = /[\\'!"#$%&()*+,\-.:;<=>?@[\]^_`{|}~]/g;
 const DEFAULT_RESPONSE = "";
 
-
-function getNumInstances(line: string) {
-    let numInstances = Number(line.split(" ")[0])
-    if (isNaN(numInstances)) {
-        return 1;
-    }
-    return numInstances;
-}
-
-function getName(line: string) {
-    // Starts with number
-    if (line.match(/^\d/)) {
-        let separated = line.split(" ");
-        return separated.slice(1).join(" ").trim().toLowerCase().replace(punctRE, '');
-    }
-    return line;
-}
 
 // Perhaps build in a delay here to prevent Scryfall from overloading.
 async function performQueries(promises: any[]) {
     return Promise.all(promises);
 }
 
-function compareToCommanders(commanders: string[], cardName: string) {
-    let isEqual = false;
-    for(let commander of commanders) {
-        if (commander === cardName) {
-            isEqual = true;
-        }
-    };
-    return isEqual;
-}
 
-const NUMBER_PATTERN = /\d+/g;
-const MTGGOLDFISH = "mtggoldfish";
-const createGoldfishUrl = (url:string) => {
-    let deckId = url.match(NUMBER_PATTERN);
-    let extractedId = deckId?.join('');
-    return "https://www.mtggoldfish.com/deck/download/"+extractedId;
-}
-
-const DECKSTATS = "deckstats";
-const createDeckstatsUrl = (url:string) => {
-    var deckUrl = new URL(url);
-    deckUrl.searchParams.set('export_txt', "1");
-    return deckUrl.toString();
-}
-
-async function getProxyUrl(url:string): Promise<string> {
-    const res = await window.fetch('/proxy.php', {
-        headers: {
-            'X-Proxy-URL': url
-        }
-    })
-    const deckFromUrl = await res.text();
-    return deckFromUrl;
-}
-
-
-async function getDeckFromURL(url:string) : Promise<string[]> {
-    let deck:string[] = [""];
-    if (url.includes(MTGGOLDFISH)) {
-        let deckUrl = createGoldfishUrl(url);
-        let deckFromUrl = await getProxyUrl(deckUrl);
-        console.log(deckFromUrl);
-        deck = deckFromUrl.split("\n");        
-    } else if (url.includes(DECKSTATS)) {
-        let deckUrl = createDeckstatsUrl(url);
-        let deckFromUrl = await getProxyUrl(deckUrl);
-       /*
-        Main
-        1 Kelsien, the Plague # !Commander
-        1 [KLD] Demolition Stomper
-
-        Some others
-        1 [KLD] Metalwork Colossus 
-
-        */
-       for(let card of deckFromUrl.split("\n")) {
-            // skip if empty line
-            if(card === "") {
-                continue;
-            }
-            // skip if no number
-            let numInstances = Number(card.split(" ")[0])
-            if (isNaN(numInstances)) {
-                continue;
-            }            
-            if(card.includes('[')){
-                // remove set tag
-                let tmpCard = card.split(" ")
-                tmpCard.splice(1, 1)
-                card = tmpCard.join(" ");
-            }
-            deck.push(card);
-       }
-    }
-    return deck;
-}
-
-function isValidHttpUrl(str:string): boolean {
-    let url;
-  
-    try {
-      url = new URL(str);
-    } catch (_) {
-      return false;  
-    }
-  
-    return url.protocol === "http:" || url.protocol === "https:";
-  }
 
 async function download(form: any): Promise<string> {
     let commander: string = form.commander;
     let partner: string = form.partner;
     let decklistForm: string = form.decklist;
 
+    let commanderIndices: number[] = [];
+    let promises: any[] = [];
+    let cards: Card[] = [];
+
     if (commander === "" && decklistForm === "") {
         return DEFAULT_RESPONSE;
     }
-    
+
     let decklist: string[] = decklistForm.split("\n");
+
     // Handle URLs
     if (isValidHttpUrl(decklist[0])) {
         decklist = await getDeckFromURL(decklist[0]);
@@ -133,17 +35,11 @@ async function download(form: any): Promise<string> {
 
     let hasCommander = commander !== "";
     if (partner !== "") {
-        commander += "\n"+partner;
+        commander += "\n" + partner;
     }
     let commanders = commander.split("\n")
         .filter((c: string) => { return c.trim() !== "" })
-        .map((c: string) => { return getName(c)});
-
-    let commanderIndices: number[] = [];
-
-    let promises: any[] = [];
-    let cards: Card[] = [];
-
+        .map((c: string) => { return getName(c) });
 
     // Build decklist with queries
     decklist.forEach((line: string, index: number) => {
@@ -158,7 +54,7 @@ async function download(form: any): Promise<string> {
         if (hasCommander) {
             let isCommander = compareToCommanders(commanders, name);
             if (isCommander) {
-                tmpCard.setType(CardType.Commander);
+                tmpCard.setCardType(CardType.Commander);
                 commanderIndices.push(index);
             }
         }
@@ -186,28 +82,44 @@ async function download(form: any): Promise<string> {
 
     // Postprocess tokens, flip and additional cards
     let postPromises: any[] = [];
-    cards.forEach(r => {
+    let tokens: { [key: string]: boolean } = {};
+
+    cards.forEach(card => {
         // Handle tokens
-        if (r.tokens.length !== 0) {
-            r.tokens.forEach((token: any) => {
+        if (card.tokens.length !== 0) {
+            card.tokens.forEach((token: any) => {
+                // if this token is already present in the list.
+                if (token.name in tokens) {
+                    return;
+                }
+                tokens[token.name] = true;
                 let tmpCard = new Card("", 1, CardType.Additional);
-                tmpCard.setUri(token);
+                tmpCard.setUri(token.uri);
                 cards.push(tmpCard);
                 postPromises.push(tmpCard.getCardPromise());
             })
         }
         // Handle flip cards
-        if (r.cardType === CardType.Flip) {
-            let tmpCard = Object.create(r);
+        if (card.cardType === CardType.Flip) {
+            // if we already have a double backed token for this card we just modify this one to go in the main deck.
+            if (card.name in tokens) {
+                card.setCardType(CardType.Default);
+                card.setBackUrl("");
+                return;
+            }
+
+            let tmpCard = new Card(card.name, card.numInstances, card.cardType);
+            Object.assign(tmpCard, card);
             tmpCard.setBackUrl(""); // reset to cardback
-            tmpCard.cardType = CardType.Default; // add a copy with hidden back to main deck
+            tmpCard.setCardType(CardType.Default); // add a copy with hidden back to main deck
             cards.push(tmpCard);
-            // make sure the double faced card gets put in the token stack
-            r.cardType = CardType.Additional;
+
+            // make sure 1 double faced card gets put in the token stack
+            card.setCardType(CardType.Additional);
+            card.setNumInstances(1);
+            tokens[card.name] = true;
         }
     });
-
-    let hasAdditional = postPromises.length > 0;
 
     // collect
     await performQueries(postPromises);
@@ -219,33 +131,23 @@ async function download(form: any): Promise<string> {
             errors.push(card.name);
         }
     });
+    // Return before download prompt
     if (errors.length > 0) {
         return errors.join("\n")
     }
 
     // Build JSON structure
-    let output = generateTabletopOutput(cards, hasAdditional, hasCommander)
-
-    // Download prompt
-    var jsonse = JSON.stringify(output);
-    var blob = new Blob([jsonse], { type: "application/json" });
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement('a');
+    let hasAdditional = Object.keys(tokens).length > 0;
+    let tabletopOutput = generateTabletopOutput(cards, hasAdditional, hasCommander);
     let fileName = "";
-    if (commanderIndices.length !== 0) {
+    if (hasCommander) {
         fileName = cards[commanderIndices[0]].name + ".json";
     } else {
         fileName = cards[0].name + ".json";
     }
+    
+    downloadPrompt(fileName, tabletopOutput);
 
-    document.body.appendChild(a);
-    a.href = url;
-    a.download = fileName;
-    a.click();
-
-    //Cleanup
-    window.URL.revokeObjectURL(url);
-    document.body.removeChild(a);
     return DEFAULT_RESPONSE;
 }
 
