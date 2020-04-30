@@ -13,8 +13,23 @@ const createDeckstatsUrl = (url: string) => {
     return deckUrl.toString();
 }
 
+const TAPPEDOUT = "tappedout";
+const createTappedoutUrl = (url: string) => {
+    var deckUrl = new URL(url);
+    deckUrl.searchParams.set('fmt', "txt");
+    return deckUrl.toString();
+}
+const MANASTACK = "manastack";
+const createManastackUrl = (url: string) => {
+    let deckId = url.match(NUMBER_PATTERN);
+    let extractedId = deckId?.join('');
+    return "https://manastack.com/api/decklist?format=simple&id="+extractedId;
+}
+
+
 async function getProxyUrl(url: string): Promise<string> {
-    const res = await window.fetch('/proxy.php', {
+    // const res = await window.fetch('/proxy.php', {
+    const res = await window.fetch('http://mtgsa.ga/proxy.php', {
         headers: {
             'X-Proxy-URL': url
         }
@@ -29,7 +44,6 @@ export async function getDeckFromURL(url: string): Promise<string[]> {
     if (url.includes(MTGGOLDFISH)) {
         let deckUrl = createGoldfishUrl(url);
         let deckFromUrl = await getProxyUrl(deckUrl);
-        console.log(deckFromUrl);
         deck = deckFromUrl.split("\n");
     } else if (url.includes(DECKSTATS)) {
         let deckUrl = createDeckstatsUrl(url);
@@ -60,6 +74,31 @@ export async function getDeckFromURL(url: string): Promise<string[]> {
                 card = tmpCard.join(" ");
             }
             deck.push(card);
+        }
+    } else if (url.includes(TAPPEDOUT)) {
+        let deckUrl = createTappedoutUrl(url);
+        let deckFromUrl = await getProxyUrl(deckUrl);
+        deck = deckFromUrl.split("\n");
+    } else if (url.includes(MANASTACK)) {
+        let deckUrl = createManastackUrl(url);
+        let deckFromUrl = await getProxyUrl(deckUrl);
+        deck = deckFromUrl.split("\n").map((card:string)=>{return card.toLowerCase()});
+        let hasSideboard = deck.indexOf("sideboard");
+        if(hasSideboard != -1) {
+            deck = deck.slice(0, hasSideboard);
+        }
+        let tmpDeck: string[] = [];
+        for (let card of deckFromUrl.split("\n")) {
+            // skip if empty line
+            if (card === "") {
+                continue;
+            }
+            // skip if no number
+            let numInstances = Number(card.split(" ")[0])
+            if (isNaN(numInstances)) {
+                continue;
+            }
+            tmpDeck.push(card);
         }
     }
     return deck;

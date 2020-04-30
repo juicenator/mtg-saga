@@ -81,7 +81,7 @@ export default function InfoForm() {
                     Paste a decklist
                 </Typography>
                 <Typography variant="caption">
-                        You can also directly paste a URL to a deck from: mtggoldfish, deckstats.
+                        You can also directly paste a URL to a deck from: mtggoldfish, deckstats, tappedout and manastack (mainboard only).
                 </Typography>
                 <Grid item xs={1}>
                 </Grid>
