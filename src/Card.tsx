@@ -115,7 +115,7 @@ export default class Card {
 
     getCardObject(): TabletopObject {
         if (this.id === -1) {
-            throw "This card is invalid "+ this.name
+            throw Error("This card is invalid "+ this.name);
         }
         return {
             "CardID": this.id,

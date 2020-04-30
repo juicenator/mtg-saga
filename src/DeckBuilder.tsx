@@ -42,6 +42,7 @@ function compareToCommanders(commanders: string[], cardName: string) {
 async function download(form: any): Promise<string> {
     let commander: string = form.commander;
     let decklist: string[] = form.decklist.split("\n");
+
     if (commander === "" && form.decklist === "") {
         return DEFAULT_RESPONSE;
     }
@@ -111,7 +112,7 @@ async function download(form: any): Promise<string> {
             })
         }
         // Handle flip cards
-        if (r.cardType == CardType.Flip) {
+        if (r.cardType === CardType.Flip) {
             let tmpCard = Object.create(r);
             tmpCard.setBackUrl(""); // reset to cardback
             tmpCard.cardType = CardType.Default; // add a copy with hidden back to main deck

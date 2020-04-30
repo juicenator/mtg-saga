@@ -54,23 +54,19 @@ export enum CardType {
 function getDeckBox(deckType: DeckType): DeckBox {
     let posX = 0;
     let posZ = 0;
-    if (deckType === DeckType.Additional) {
-        posX = 4;
-        posZ = 0;
-    } else if (deckType === DeckType.Commander) {
-        posX = 0;
-        posZ = 4;
+
+    switch (deckType as DeckType) {
+        case DeckType.Additional: {
+            posX = 4;
+            posZ = 0;
+            break;
+        }
+        case DeckType.Commander: {
+            posX = 0;
+            posZ = 4;
+            break;
+        }
     }
-    // switch (deckType) {
-    //     case DeckType.Additional: {
-    //         posX = 4;
-    //         posZ = 0;
-    //     }
-    //     case DeckType.Commander: {
-    //         posX = 0;
-    //         posZ = 4;
-    //     }
-    // }
     
     return {
         "Name": "DeckCustom",
@@ -115,7 +111,7 @@ export function generateTabletopOutput(cards: Card[], hasAdditional:boolean, has
         console.log("Handle deck type: " + deckType);
         if (!(deckType in cardIds)) cardIds[deckType] = 1;
         cards.filter((c) => {
-            return !(c.cardType.toString() === deckType);
+            return (c.cardType.toString() === deckType);
         }).forEach((card: any) => {
             for (let i = 0; i < card.num_instances; i++) {
                 let tmpCardId = cardIds[deckType] * 100 + cardOffsets;

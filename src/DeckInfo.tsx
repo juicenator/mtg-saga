@@ -4,7 +4,7 @@ import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
 import Button from "@material-ui/core/Button";
 import Icon from '@material-ui/core/Icon';
-import download from './DeckBox';
+import download from './DeckBuilder';
 import useStyles from './Styles';
 
 import step1 from './images/step-1.svg' // relative path to image
@@ -42,7 +42,7 @@ export default function InfoForm() {
                         fullWidth
                         multiline
                         rows={2}
-                        placeholder={"Alela, Artful Provocateur\n"+"A commander companion"}
+                        placeholder={"Alela, Artful Provocateur\nOptional: commander companion"}
                         helperText="They will be spawned next to the deck,
                         so you don't have to search!"
                     />
