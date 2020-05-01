@@ -4,13 +4,16 @@ import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
 import Button from "@material-ui/core/Button";
 import Icon from '@material-ui/core/Icon';
+import AppleIcon from '@material-ui/icons/Apple';
+import LaptopWindowsIcon from '@material-ui/icons/LaptopWindows';
+
 import download from './DeckBuilder';
 import useStyles from './Styles';
 
 import step1 from './images/step-1.svg' // relative path to image
 import step2 from './images/step-2.svg' // relative path to image
 import step3 from './images/step-3.svg' // relative path to image
-import { FormGroup, Switch, FormControlLabel } from '@material-ui/core';
+import { FormGroup, Switch, FormControlLabel, Tooltip, SvgIcon } from '@material-ui/core';
 
 export default function InfoForm() {
     const classes = useStyles();
@@ -20,15 +23,14 @@ export default function InfoForm() {
     const [checked, setChecked] = useState(false);
 
     return (
-        <Grid container spacing={1}>
+        <Grid container direction="row" spacing={1}>
             <Grid item xs={1}>
                 <Icon>
                     <img className={"Step"} src={step1} alt="step-1" />
                 </Icon>
             </Grid>
             <Grid item xs={11}>
-                <Typography variant="h6"
-                >
+                <Typography variant="h6">
                     Optional: Who is your Commander?
                 </Typography>
                 <FormGroup row>
@@ -69,7 +71,7 @@ export default function InfoForm() {
                 </FormGroup>
             </Grid>
 
-            <Grid container spacing={1}>
+            <Grid container direction="row" spacing={1}>
                 <Grid item xs={1}>
                     <Icon>
                         <img className={"Step"} src={step2} alt="step-2" />
@@ -81,10 +83,32 @@ export default function InfoForm() {
                     Paste a decklist
                 </Typography>
                 <Typography variant="caption">
-                        You can also directly paste a URL to a deck from: mtggoldfish, deckstats, tappedout and manastack (mainboard only).
+                    You can also directly paste a URL to a deck from:
+                    &nbsp;
+                        <Tooltip title="Format: https://mtggoldfish.com/deck/1234567" arrow>
+                        <Typography variant="caption">
+                            <u>mtggoldfish</u>,
+                        </Typography>
+                    </Tooltip>
+                    &nbsp;
+                    <Tooltip title="Format: https://deckstats.net/decks/12345/1234567-my-awesome-deck/en" arrow>
+                        <Typography variant="caption">
+                            <u>deckstats</u>,
+                        </Typography>
+                    </Tooltip>
+                    &nbsp;
+                    <Tooltip title="Format: http://tappedout.net/mtg-decks/my-awesome-deck/" arrow>
+                        <Typography variant="caption">
+                            <u>tappedout</u>,
+                        </Typography>
+                    </Tooltip>
+                    &nbsp;
+                        <Tooltip title="Format: https://manastack.com/builder/123456 (downloads mainboard only)." arrow>
+                        <Typography variant="caption">
+                            <u>manastack</u>.
+                        </Typography>
+                    </Tooltip>
                 </Typography>
-                <Grid item xs={1}>
-                </Grid>
                 <Grid item xs={12} container justify="center">
                     <TextField
                         id="decklist"
@@ -95,8 +119,8 @@ export default function InfoForm() {
                             setForm({ ...form, "decklist": e.target.value })
                         }}
                         InputLabelProps={{ shrink: true }}
-                        placeholder={"https://www.mtggoldfish.com/deck/1234567\n" +
-                            "OR\n"+
+                        placeholder={"https://mtggoldfish.com/deck/1234567 (hover sites^ to see URL format)\n" +
+                            "OR\n" +
                             "1 Aether Hub\n" +
                             "1 Anointed Procession\n" +
                             "6 Island\n" +
@@ -108,22 +132,44 @@ export default function InfoForm() {
                     />
                 </Grid>
             </Grid>
-
-            <Grid container spacing={1}>
+            {/* Step 2.5 */}
+            <Grid container direction="row" spacing={1}>
                 <Grid item xs={1}>
                 </Grid>
                 <Grid item xs={11}>
-                    <br />
+                    <Typography variant="caption">
                     Save the output file in the Tabletop Simulator folder:
-                    <pre className={"Wrap"}>
-                        On windows:<br />
-                    C:\Users\YOUR_NAME\Documents\My Games\Tabletop Simulator\Saves\Saved Objects\</pre>
-                    <pre className={"Wrap"}>
-                        On mac:<br />
-                    ~/Library/Tabletop Simulator/Saves/Saved Objects/</pre>
+                    </Typography>
                 </Grid>
             </Grid>
-            <Grid container spacing={1}>
+            <Grid container direction="row" spacing={1}>
+                <Grid item xs={1}>
+                <Typography variant="caption">
+                    <SvgIcon>
+                        <LaptopWindowsIcon aria-label="windows"></LaptopWindowsIcon>
+                    </SvgIcon>
+                    </Typography>                    
+                </Grid>
+                <Grid item xs={11}>
+                    <Typography variant="caption" className={"Wrap"}>
+                    C:\Users\YOUR_NAME\Documents\My Games\Tabletop Simulator\Saves\Saved Objects\
+                    </Typography>
+                </Grid>
+            </Grid>
+            <Grid container direction="row" spacing={1}>
+                <Grid item xs={1}>
+                <SvgIcon>
+                    <AppleIcon aria-label="mac"></AppleIcon>
+                </SvgIcon>
+                </Grid>
+                <Grid item xs={11}>
+                    <Typography variant="caption" className={"Wrap"}>
+                    ~/Library/Tabletop Simulator/Saves/Saved Objects/
+                    </Typography>
+                </Grid>
+            </Grid>
+            {/* Step 3 */}
+            <Grid container spacing={1} className={classes.spacing}>
                 <Grid item xs={1}>
                     <Icon>
                         <img className={"Step"} src={step3} alt="step-3" />

@@ -12,13 +12,13 @@ import './App.css';
 
 function Copyright() {
   return (
-      <Typography variant="caption" color="textSecondary" justify-content="center" align="center">
+      <Typography variant="caption" color="textSecondary" align="center">
         {'Copyright © Anton Steenvoorden - '}
         {new Date().getFullYear()}
         {'. Made possible by '}
         <Link color="inherit" href="https://scryfall.com/">
-          Scryfall.com
-        </Link>{' '}
+          scryfall.com
+        </Link>
       </Typography>
   );
 }
