@@ -1,8 +1,8 @@
 body {
   background-image:url("images/mtg.svg");
-  background-position:bottom right;
+  background-position:top right;
   background-repeat:no-repeat;
-  background-size: 35%;
+  background-size: 50%;
 }
 
 .App {
@@ -19,7 +19,7 @@ body {
   object-fit: cover;
   height: 6vmin;
   min-height: 30px;
-  margin-top:-.5vmin;
+  margin-top:-1vmin;
 }
 
 .Wrap {

@@ -17,13 +17,14 @@ import { FormGroup, Switch, FormControlLabel, Tooltip, SvgIcon } from '@material
 
 export default function InfoForm() {
     const classes = useStyles();
-    const [form, setForm] = useState({ "commander": "", "partner": "", "decklist": "" });
+    const [form, setForm] = useState({ "commander": "", "partner": "", "decklist": "", "sideboard": "" });
     const [disabled, setDisabled] = useState(false);
+    const [sideboardEnabled, setSideboardEnabled] = useState(false);
     const [errors, setErrors] = useState("");
     const [checked, setChecked] = useState(false);
 
     return (
-        <Grid container direction="row" spacing={1}>
+        <Grid item container direction="row" spacing={1}>
             <Grid item xs={1}>
                 <Icon>
                     <img className={"Step"} src={step1} alt="step-1" />
@@ -53,6 +54,7 @@ export default function InfoForm() {
                     <FormControlLabel
                         control={<Switch disabled={form.commander === ""} checked={checked} onChange={(e) => {
                             setChecked(e.target.checked);
+                            setForm({ ...form, "partner": "" });
                         }} name="partner-switch" size="small" />}
                         label="Partner"
                     />
@@ -71,7 +73,7 @@ export default function InfoForm() {
                 </FormGroup>
             </Grid>
 
-            <Grid container direction="row" spacing={1}>
+            <Grid item container direction="row" spacing={1}>
                 <Grid item xs={1}>
                     <Icon>
                         <img className={"Step"} src={step2} alt="step-2" />
@@ -109,67 +111,109 @@ export default function InfoForm() {
                         </Typography>
                     </Tooltip>
                 </Typography>
-                <Grid item xs={12} container justify="center">
-                    <TextField
-                        id="decklist"
-                        name="decklist"
-                        label="Decklist"
-                        value={form.decklist}
-                        onChange={(e) => {
-                            setForm({ ...form, "decklist": e.target.value })
-                        }}
-                        InputLabelProps={{ shrink: true }}
-                        placeholder={"https://mtggoldfish.com/deck/1234567 (hover sites^ to see URL format)\n" +
-                            "OR\n" +
-                            "1 Aether Hub\n" +
-                            "1 Anointed Procession\n" +
-                            "6 Island\n" +
-                            "...."}
-                        fullWidth
-                        multiline
-                        rows={6}
-                        variant={"outlined"}
-                    />
+                <Grid item container>
+                    <Grid container item xs={12}>
+                        <TextField
+                            id="decklist"
+                            name="decklist"
+                            label="Decklist"
+                            value={form.decklist}
+                            onChange={(e) => {
+                                setForm({ ...form, "decklist": e.target.value });
+                            }}
+                            InputLabelProps={{ shrink: true }}
+                            placeholder={"https://mtggoldfish.com/deck/1234567 (hover sites^ to see URL format)\n" +
+                                "OR\n" +
+                                "1 Aether Hub\n" +
+                                "1 Anointed Procession\n" +
+                                "6 Island\n" +
+                                "...."}
+                            fullWidth
+                            multiline
+                            rows={6}
+                            variant={"outlined"}
+                        />
+                    </Grid>
+                    <Grid container item xs={12}>
+                        <span style={{ flex: 1 }}></span>
+                        <FormGroup row>
+                            <FormControlLabel
+                                control={
+                                    <Switch disabled={form.decklist === "" || form.decklist.includes("http")}
+                                        checked={sideboardEnabled && form.decklist !== ""}
+                                        onChange={(e) => {
+                                            setSideboardEnabled(e.target.checked);
+                                            setForm({ ...form, "sideboard": "" });
+                                        }} 
+                                        name="sideboard-switch" 
+                                        size="small" />
+                                }
+                                label="Sideboard"
+                            />
+                        </FormGroup>
+                    </Grid>
+                    {/* Sideboard */}
+                    {sideboardEnabled && form.decklist !== "" ? <Grid container item xs={12}>
+                        <TextField
+                            id="sideboard"
+                            name="sideboard"
+                            label="Sideboard"
+                            value={form.sideboard}
+                            onChange={(e) => {
+                                setForm({ ...form, "sideboard": e.target.value })
+                            }}
+                            InputLabelProps={{ shrink: true }}
+                            placeholder={
+                                "1 Stolen by the Fae\n" +
+                                "1 Prismite\n" +
+                                "6 Plains\n" +
+                                "...."}
+                            fullWidth
+                            multiline
+                            rows={4}
+                            variant={"outlined"}
+                        />
+                    </Grid> : null}
                 </Grid>
             </Grid>
             {/* Step 2.5 */}
-            <Grid container direction="row" spacing={1}>
+            <Grid item container direction="row" spacing={1}>
                 <Grid item xs={1}>
                 </Grid>
                 <Grid item xs={11}>
                     <Typography variant="caption">
-                    Save the output file in the Tabletop Simulator folder:
+                        Save the output file in the Tabletop Simulator folder:
                     </Typography>
                 </Grid>
             </Grid>
-            <Grid container direction="row" spacing={1}>
+            <Grid item container direction="row" spacing={1}>
                 <Grid item xs={1}>
-                <Typography variant="caption">
+                    <Typography variant="caption">
+                        <SvgIcon>
+                            <LaptopWindowsIcon aria-label="windows"></LaptopWindowsIcon>
+                        </SvgIcon>
+                    </Typography>
+                </Grid>
+                <Grid item xs={11}>
+                    <Typography variant="caption" className={"Wrap"}>
+                        C:\Users\YOUR_NAME\Documents\My Games\Tabletop Simulator\Saves\Saved Objects\
+                    </Typography>
+                </Grid>
+            </Grid>
+            <Grid item container direction="row" spacing={1}>
+                <Grid item xs={1}>
                     <SvgIcon>
-                        <LaptopWindowsIcon aria-label="windows"></LaptopWindowsIcon>
+                        <AppleIcon aria-label="mac"></AppleIcon>
                     </SvgIcon>
-                    </Typography>                    
                 </Grid>
                 <Grid item xs={11}>
                     <Typography variant="caption" className={"Wrap"}>
-                    C:\Users\YOUR_NAME\Documents\My Games\Tabletop Simulator\Saves\Saved Objects\
-                    </Typography>
-                </Grid>
-            </Grid>
-            <Grid container direction="row" spacing={1}>
-                <Grid item xs={1}>
-                <SvgIcon>
-                    <AppleIcon aria-label="mac"></AppleIcon>
-                </SvgIcon>
-                </Grid>
-                <Grid item xs={11}>
-                    <Typography variant="caption" className={"Wrap"}>
-                    ~/Library/Tabletop Simulator/Saves/Saved Objects/
+                        ~/Library/Tabletop Simulator/Saves/Saved Objects/
                     </Typography>
                 </Grid>
             </Grid>
             {/* Step 3 */}
-            <Grid container spacing={1} className={classes.spacing}>
+            <Grid item container spacing={1} className={classes.spacing}>
                 <Grid item xs={1}>
                     <Icon>
                         <img className={"Step"} src={step3} alt="step-3" />
