@@ -23,8 +23,8 @@ const useStyles = makeStyles((theme) => ({
         marginBottom: theme.spacing(3),
         padding: theme.spacing(2),
         [theme.breakpoints.up(610 + theme.spacing(3) * 2)]: {
-            marginTop: theme.spacing(6),
-            marginBottom: theme.spacing(6),
+            marginTop: theme.spacing(5),
+            marginBottom: theme.spacing(5),
             padding: theme.spacing(3),
         },
     },
@@ -37,6 +37,9 @@ const useStyles = makeStyles((theme) => ({
     },
     heading: {
         marginLeft: theme.spacing(0.5),
+    },
+    spacing: {
+        marginTop: theme.spacing(1),
     }
 }));
 export default useStyles;

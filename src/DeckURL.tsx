@@ -23,19 +23,22 @@ const MANASTACK = "manastack";
 const createManastackUrl = (url: string) => {
     let deckId = url.match(NUMBER_PATTERN);
     let extractedId = deckId?.join('');
-    return "https://manastack.com/api/decklist?format=simple&id="+extractedId;
+    return "https://manastack.com/api/decklist?format=simple&id=" + extractedId;
 }
 
 
 async function getProxyUrl(url: string): Promise<string> {
-    // const res = await window.fetch('/proxy.php', {
-    const res = await window.fetch('http://mtgsa.ga/proxy.php', {
-        headers: {
-            'X-Proxy-URL': url
-        }
-    })
-    const deckFromUrl = await res.text();
-    return deckFromUrl;
+    try {
+        const res = await window.fetch('/proxy.php', {
+            headers: {
+                'X-Proxy-URL': url
+            }
+        })
+        const deckFromUrl = await res.text();
+        return deckFromUrl;
+    } catch (e) {
+        return "";
+    }
 }
 
 
@@ -82,13 +85,14 @@ export async function getDeckFromURL(url: string): Promise<string[]> {
     } else if (url.includes(MANASTACK)) {
         let deckUrl = createManastackUrl(url);
         let deckFromUrl = await getProxyUrl(deckUrl);
-        deck = deckFromUrl.split("\n").map((card:string)=>{return card.toLowerCase()});
+        deck = deckFromUrl.split("\n").map((card: string) => { return card.trim().toLowerCase() });
+
         let hasSideboard = deck.indexOf("sideboard");
-        if(hasSideboard !== -1) {
+        if (hasSideboard !== -1) {
             deck = deck.slice(0, hasSideboard);
         }
         let tmpDeck: string[] = [];
-        for (let card of deckFromUrl.split("\n")) {
+        for (let card of deck) {
             // skip if empty line
             if (card === "") {
                 continue;
@@ -100,6 +104,7 @@ export async function getDeckFromURL(url: string): Promise<string[]> {
             }
             tmpDeck.push(card);
         }
+        deck = tmpDeck;
     }
     return deck;
 }

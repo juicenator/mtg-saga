@@ -8,7 +8,7 @@ export type DeckBox = {
     "Name": "DeckCustom",
     "ContainedObjects": TabletopObject[],
     "DeckIDs": number[],
-    "CustomDeck": {[key:string]:TabletopCard},
+    "CustomDeck": { [key: string]: TabletopCard },
     "Transform": {}
 }
 
@@ -42,12 +42,14 @@ export enum DeckType {
     Default = "default",
     Additional = "additional",
     Commander = "commander",
+    Sideboard = "sideboard"
 }
 
 export enum CardType {
     Default = "default",
     Additional = "additional",
     Commander = "commander",
+    Sideboard = "sideboard",
     Flip = "flip"
 }
 
@@ -66,8 +68,13 @@ function getDeckBox(deckType: DeckType): DeckBox {
             posZ = 4;
             break;
         }
+        case DeckType.Sideboard: {
+            posX = 0;
+            posZ = -4;
+            break;
+        }
     }
-    
+
     return {
         "Name": "DeckCustom",
         "ContainedObjects": [],
@@ -87,13 +94,13 @@ function getDeckBox(deckType: DeckType): DeckBox {
     }
 }
 
-export function generateTabletopOutput(cards: Card[], hasAdditional:boolean, hasCommander:boolean): TabletopOutput {
+export function generateTabletopOutput(cards: Card[], hasAdditional: boolean, hasCommander: boolean, hasSideboard: boolean): TabletopOutput {
     let deckTypes = [DeckType.Default];
     // Prepare deckboxes
     let deckBoxes: { [key: string]: DeckBox; } = {};
     deckBoxes[DeckType.Default] = getDeckBox(DeckType.Default);
 
-    if(hasAdditional) {
+    if (hasAdditional) {
         deckBoxes[DeckType.Additional] = getDeckBox(DeckType.Additional);
         deckTypes.push(DeckType.Additional);
     }
@@ -101,6 +108,11 @@ export function generateTabletopOutput(cards: Card[], hasAdditional:boolean, has
     if (hasCommander) {
         deckBoxes[DeckType.Commander] = getDeckBox(DeckType.Commander);
         deckTypes.push(DeckType.Commander);
+    }
+
+    if (hasSideboard) {
+        deckBoxes[DeckType.Sideboard] = getDeckBox(DeckType.Sideboard);
+        deckTypes.push(DeckType.Sideboard);
     }
 
     console.log("Building JSON");
@@ -135,20 +147,22 @@ export function generateTabletopOutput(cards: Card[], hasAdditional:boolean, has
         });
 
         // Padding if needed
-        if (cardIds[deckType] <= 1) {
+        if (cardIds[deckType] <= 2) {
             let tmpCardId = cardIds[deckType] * 100 + cardOffsets;
             let tmpCard = new Card("Padding", 1, CardType.Default);
             tmpCard.setId(tmpCardId);
-            deckBoxes[deckType].DeckIDs.push(tmpCardId);
-            deckBoxes[deckType].ContainedObjects.push(tmpCard.getCardObject());
+            deckBoxes[deckType].DeckIDs.unshift(tmpCardId);
+            deckBoxes[deckType].ContainedObjects.unshift(tmpCard.getCardObject());
             deckBoxes[deckType].CustomDeck[String(cardIds[deckType])] = tmpCard.getTabletopCard();
         }
         // Offset for different stack ids
         cardOffsets += 1;
     });
+    
     let objectStates = [deckBoxes[DeckType.Default]];
     if (hasAdditional) objectStates.push(deckBoxes[DeckType.Additional]);
     if (hasCommander) objectStates.push(deckBoxes[DeckType.Commander]);
+    if (hasSideboard) objectStates.push(deckBoxes[DeckType.Sideboard]);
 
     return {
         "ObjectStates": objectStates

@@ -11,26 +11,22 @@ async function performQueries(promises: any[]) {
     return Promise.all(promises);
 }
 
-
-
 async function download(form: any): Promise<string> {
+    // single forms
     let commander: string = form.commander;
     let partner: string = form.partner;
+    
+    // multiline forms
     let decklistForm: string = form.decklist;
+    let sideboardForm: string = form.sideboard;
 
+    // keep track of cards and commanders
     let commanderIndices: number[] = [];
     let promises: any[] = [];
     let cards: Card[] = [];
 
     if (commander === "" && decklistForm === "") {
         return DEFAULT_RESPONSE;
-    }
-
-    let decklist: string[] = decklistForm.split("\n");
-
-    // Handle URLs
-    if (isValidHttpUrl(decklist[0])) {
-        decklist = await getDeckFromURL(decklist[0]);
     }
 
     let hasCommander = commander !== "";
@@ -40,6 +36,18 @@ async function download(form: any): Promise<string> {
     let commanders = commander.split("\n")
         .filter((c: string) => { return c.trim() !== "" })
         .map((c: string) => { return getName(c) });
+
+    let hasSideboard = sideboardForm !== "";
+    
+    // start parsing
+    let decklist: string[] = decklistForm.split("\n");
+    let sideboard: string[] = sideboardForm.split("\n");
+
+    // Handle URLs
+    if (isValidHttpUrl(decklist[0])) {
+        decklist = await getDeckFromURL(decklist[0]);
+    }
+
 
     // Build decklist with queries
     decklist.forEach((line: string, index: number) => {
@@ -76,6 +84,19 @@ async function download(form: any): Promise<string> {
             promises.push(tmpCard.getCardPromise());
         })
     }
+
+    // Parse sideboard
+    sideboard.forEach((line: string, index: number) => {
+        if (line === "" || line.startsWith("//")) {
+            return;
+        }
+        line = line.trim();
+        let numInstances = getNumInstances(line);
+        let name = getName(line);
+        let tmpCard = new Card(name, numInstances, CardType.Sideboard);
+        cards.push(tmpCard);
+        promises.push(tmpCard.getCardPromise());
+    });
 
     // collect
     await performQueries(promises);
@@ -138,7 +159,7 @@ async function download(form: any): Promise<string> {
 
     // Build JSON structure
     let hasAdditional = Object.keys(tokens).length > 0;
-    let tabletopOutput = generateTabletopOutput(cards, hasAdditional, hasCommander);
+    let tabletopOutput = generateTabletopOutput(cards, hasAdditional, hasCommander, hasSideboard);
     let fileName = "";
     if (hasCommander) {
         fileName = cards[commanderIndices[0]].name + ".json";
@@ -147,7 +168,7 @@ async function download(form: any): Promise<string> {
     }
     
     downloadPrompt(fileName, tabletopOutput);
-
+    console.log(tabletopOutput);
     return DEFAULT_RESPONSE;
 }
 

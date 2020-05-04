@@ -17,14 +17,14 @@ const RouterPage = (
 
 function Copyright() {
   return (
-    <Typography variant="caption" color="textSecondary" justify-content="center" align="center">
-      {'Copyright © Anton Steenvoorden - '}
-      {new Date().getFullYear()}
-      {'. Made possible by '}
-      <Link color="inherit" href="https://scryfall.com/">
-        Scryfall.com
-        </Link>{' '}
-    </Typography>
+      <Typography variant="caption" color="textSecondary" align="center">
+        {'Copyright © Anton Steenvoorden - '}
+        {new Date().getFullYear()}
+        {'. Made possible by '}
+        <Link color="inherit" href="https://scryfall.com/">
+          scryfall.com
+        </Link>
+      </Typography>
   );
 }
 
@@ -43,11 +43,11 @@ function App() {
             </Typography>
           </Link>
           <span style={{ flex: 1 }}></span>
-          <Link href="/sealed">
+          <Link href="/sealed" style={{ textDecoration: 'none' }} color="inherit">
             <Button
+              type="submit"
               name="sealed"
               variant="contained"
-              color="inherit"
               aria-label="Generate a sealed pack"
             >
               Sealed

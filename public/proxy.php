@@ -48,7 +48,11 @@ $valid_requests = array(
     'deckstats.net',
     'www.deckstats.net',
     'mtggoldfish.com',
-    'www.mtggoldfish.com'
+    'www.mtggoldfish.com',
+    'tappedout.net',
+    'www.tappedout.net',
+    'manastack.com',
+    'www.manastack.com'
 );
 
 /**
