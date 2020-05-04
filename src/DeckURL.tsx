@@ -84,7 +84,7 @@ export async function getDeckFromURL(url: string): Promise<string[]> {
         let deckFromUrl = await getProxyUrl(deckUrl);
         deck = deckFromUrl.split("\n").map((card:string)=>{return card.toLowerCase()});
         let hasSideboard = deck.indexOf("sideboard");
-        if(hasSideboard != -1) {
+        if(hasSideboard !== -1) {
             deck = deck.slice(0, hasSideboard);
         }
         let tmpDeck: string[] = [];
