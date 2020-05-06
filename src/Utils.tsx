@@ -33,7 +33,7 @@ export function getName(line: string) {
         let separated = line.split(" ");
         return separated.slice(1).join(" ").trim().toLowerCase().replace(punctRE, '');
     }
-    return line;
+    return line.trim().toLowerCase().replace(punctRE, '');
 }
 
 export function compareToCommanders(commanders: string[], cardName: string) {

@@ -16,10 +16,9 @@ import { SetComponent } from './SealedGenerator';
 
 export default function InfoForm() {
     const classes = useStyles();
-    const [form, setForm] = useState({ "commander": "", "partner": "", "decklist": "" });
+    const [form, setForm] = useState({ "players": 1, "set":""});
     const [disabled, setDisabled] = useState(false);
     const [errors, setErrors] = useState("");
-    const [checked, setChecked] = useState(false);
 
     return (
         <Paper className={classes.paper}>
@@ -34,8 +33,7 @@ export default function InfoForm() {
                     </Icon>
                 </Grid>
                 <Grid item xs={11}>
-                    <Typography variant="h6"
-                    >
+                    <Typography variant="h6">
                         Select the set to play
                 </Typography>
                     <form>
@@ -49,6 +47,28 @@ export default function InfoForm() {
                             <img className={"Step"} src={step2} alt="step-2" />
                         </Icon>
                     </Grid>
+                    <Grid item xs={11}>
+                    <Typography variant="h6">
+                        Number of players
+                    </Typography>
+                    <FormGroup row>
+                        <Grid item xs={8} container>
+                            <TextField
+                                id="players"
+                                name="players"
+                                label="players"
+                                value={form.players}
+                                onChange={(e) => {
+                                    setForm({ ...form, "players": parseInt(e.target.value)})
+                                }}
+                                InputLabelProps={{ shrink: true }}
+                                placeholder={"Alela, Artful Provocateur"}
+                                helperText="Will be spawned next to the deck for convenience!"
+                                fullWidth
+                            />
+                        </Grid>
+                    </FormGroup>
+                </Grid>
                 </Grid>
 
                 <Grid container spacing={1}>
@@ -70,7 +90,7 @@ export default function InfoForm() {
                                 setDisabled(false);
                             }}
                             aria-label="download tabletop JSON"
-                            disabled={disabled || (form.commander === "" && form.decklist === "")}
+                            disabled={disabled}
                         >
                             Download Tabletop Simulator file
                     </Button>
