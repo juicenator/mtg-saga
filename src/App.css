@@ -29,3 +29,8 @@ body {
   white-space: -moz-pre-wrap;
   white-space: -o-pre-wrap;
 }
+
+.CardBack {
+  width:122px;
+  height:170px;
+}

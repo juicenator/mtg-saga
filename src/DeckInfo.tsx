@@ -10,18 +10,21 @@ import LaptopWindowsIcon from '@material-ui/icons/LaptopWindows';
 import download from './DeckBuilder';
 import useStyles from './Styles';
 
+import {isValidHttpUrl} from './Utils';
+
 import step1 from './images/step-1.svg' // relative path to image
 import step2 from './images/step-2.svg' // relative path to image
 import step3 from './images/step-3.svg' // relative path to image
-import { FormGroup, Switch, FormControlLabel, Tooltip, SvgIcon, Paper } from '@material-ui/core';
+import { FormGroup, Switch, FormControlLabel, Tooltip, SvgIcon, Paper, CardMedia, Card } from '@material-ui/core';
 
 export default function InfoForm() {
     const classes = useStyles();
-    const [form, setForm] = useState({ "commander": "", "partner": "", "decklist": "", "sideboard": "" });
+    const [form, setForm] = useState({ "commander": "", "partner": "", "decklist": "", "sideboard": "", "cardback": "" });
     const [disabled, setDisabled] = useState(false);
     const [sideboardEnabled, setSideboardEnabled] = useState(false);
     const [errors, setErrors] = useState("");
     const [checked, setChecked] = useState(false);
+    const [customCardBackChecked, setCustomCardBackChecked] = useState(false);
 
     return (
         <Paper className={classes.paper}>
@@ -216,6 +219,50 @@ export default function InfoForm() {
                     </Typography>
                     </Grid>
                 </Grid>
+                {/* CARD BACK */}
+                <Grid item container direction="row" spacing={1}>
+                    <Grid item xs={1}>
+                    </Grid>
+                    <Grid item container xs={11} direction="row">
+                        <FormGroup row>
+                            <FormControlLabel
+                                control={<Switch disabled={form.decklist === ""} checked={customCardBackChecked} onChange={(e) => {
+                                    setCustomCardBackChecked(e.target.checked);
+                                    setForm({ ...form, "cardback": "https://imgur.com/GLn8lMl.jpg" });
+                                }} name="cardback-switch" size="small" />}
+                                label="Custom Card Back"
+                            />
+                        </FormGroup>
+                        {customCardBackChecked ?
+                            <Grid item container xs={11} direction="row">
+                                <TextField
+                                    id="cardback"
+                                    name="cardback"
+                                    label="Custom Card Back"
+                                    value={form.cardback}
+                                    onChange={(e) => {
+                                        setForm({ ...form, "cardback": e.target.value })
+                                        // test if correct url, if so, set download on OK
+                                        if (!isValidHttpUrl(e.target.value)){
+                                            setDisabled(true);
+                                        } else {
+                                            setDisabled(false);
+                                        }                             
+                                    }}
+                                    InputLabelProps={{ shrink: true }}
+                                    placeholder={"https://imgur.com/GLn8lMl.jpg"}
+                                    helperText="Paste a URL to a card image with a ratio of 488 × 680"
+                                    fullWidth
+                                />
+                                <Card className={"CardBack"}>
+                                    <CardMedia image={form.cardback} className={"CardBack"}>
+                                    </CardMedia>
+                                </Card>
+                            </Grid>
+                            : null}
+                    </Grid>
+                </Grid>
+
                 {/* Step 3 */}
                 <Grid item container spacing={1} className={classes.spacing}>
                     <Grid item xs={1}>

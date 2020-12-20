@@ -1,7 +1,8 @@
-import Card from './Card';
+import Card, {SCRYFALL_CARD_BACK_IMAGE_URL} from './Card';
 import { CardType, generateTabletopOutput } from './Tabletop';
-import { getDeckFromURL, isValidHttpUrl } from './DeckURL';
+import { getDeckFromURL } from './DeckURL';
 import { getName, getNumInstances, compareToCommanders, downloadPrompt } from './Utils';
+import { isValidHttpUrl } from './Utils';
 
 const DEFAULT_RESPONSE = "";
 
@@ -15,6 +16,13 @@ async function download(form: any): Promise<string> {
     // single forms
     let commander: string = form.commander;
     let partner: string = form.partner;
+    let cardBack: string = form.cardback.trim(); 
+    if (!isValidHttpUrl(cardBack)) {
+        cardBack = SCRYFALL_CARD_BACK_IMAGE_URL;
+    }
+
+    // CustomCardBack
+    console.log("Using custom cardback: ", cardBack);
     
     // multiline forms
     let decklistForm: string = form.decklist;
@@ -37,7 +45,7 @@ async function download(form: any): Promise<string> {
         .filter((c: string) => { return c.trim() !== "" })
         .map((c: string) => { return getName(c) });
     
-        console.log("commanders: "+ commanders);
+    console.log("commanders: "+ commanders);
     let hasSideboard = sideboardForm !== "";
     
     // start parsing
@@ -61,6 +69,7 @@ async function download(form: any): Promise<string> {
         let numInstances = getNumInstances(line);
         let name = getName(line);
         let tmpCard = new Card(name, numInstances, CardType.Default);
+        tmpCard.setBackUrl(cardBack);
 
         if (hasCommander) {
             let isCommander = compareToCommanders(commanders, name);
@@ -83,6 +92,7 @@ async function download(form: any): Promise<string> {
             line = line.trim();
             let name = getName(line);
             let tmpCard = new Card(name, 1, CardType.Commander);
+            tmpCard.setBackUrl(cardBack);
             commanderIndices.push(cards.length);
             cards.push(tmpCard);
             promises.push(tmpCard.getCardPromise());
@@ -98,6 +108,7 @@ async function download(form: any): Promise<string> {
         let numInstances = getNumInstances(line);
         let name = getName(line);
         let tmpCard = new Card(name, numInstances, CardType.Sideboard);
+        tmpCard.setBackUrl(cardBack);
         cards.push(tmpCard);
         promises.push(tmpCard.getCardPromise());
     });
@@ -135,7 +146,7 @@ async function download(form: any): Promise<string> {
 
             let tmpCard = new Card(card.name, card.numInstances, card.cardType);
             Object.assign(tmpCard, card);
-            tmpCard.setBackUrl(""); // reset to cardback
+            tmpCard.setBackUrl(cardBack); // reset to cardback
             tmpCard.setCardType(CardType.Default); // add a copy with hidden back to main deck
             cards.push(tmpCard);
 

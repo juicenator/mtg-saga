@@ -1,7 +1,20 @@
-import {CardType, TabletopCard, TabletopObject} from './Tabletop';
+import { CardType, TabletopCard, TabletopObject } from './Tabletop';
+import { isValidHttpUrl } from './Utils';
 
-const SCRYFALL_CARD_BACK_IMAGE_URL = "https://img.scryfall.com/errors/missing.jpg";
+export const SCRYFALL_CARD_BACK_IMAGE_URL = "https://img.scryfall.com/errors/missing.jpg";
 const SCRYFALL_API_URL = "https://api.scryfall.com/cards/named?fuzzy=";
+
+let cardBack = SCRYFALL_CARD_BACK_IMAGE_URL;
+function getCardBack() {
+    return cardBack;
+}
+export function setCardBack(tmpCardBack: string) {
+    if (tmpCardBack.trim() !== "" && isValidHttpUrl(tmpCardBack)) {
+        cardBack = tmpCardBack;
+    } else {
+        cardBack = SCRYFALL_CARD_BACK_IMAGE_URL;
+    }
+}
 
 type Token = {
     name: string,
@@ -38,8 +51,8 @@ export default class Card {
     }
 
     setBackUrl(url: string) {
-        if(url === "") {
-            this.back_url = SCRYFALL_CARD_BACK_IMAGE_URL;
+        if (url === "") {
+            this.back_url = getCardBack();
             return
         }
         this.back_url = url;
@@ -56,11 +69,11 @@ export default class Card {
     setId(id: number) {
         this.id = id;
     }
-    
+
     setNumInstances(num: number) {
         this.numInstances = num;
     }
-    
+
     parseResults(body: any) {
         // handle failure
         if (!body.name) {
@@ -74,29 +87,29 @@ export default class Card {
             this.setFrontUrl(body.image_uris.normal);
         }
         // if flip card
-        if (body.card_faces && !body.image_uris){
+        if (body.card_faces && !body.image_uris) {
             this.setFrontUrl(body.card_faces[0].image_uris.normal);
             this.setBackUrl(body.card_faces[1].image_uris.normal);
             this.cardType = CardType.Flip
         }
         // if normal card
-        if(body.image_uris){
+        if (body.image_uris) {
             this.setFrontUrl(body.image_uris.normal);
         }
         // tokens (only if called first time)
-        if(!this.uri && body.all_parts) {
-            body.all_parts.forEach((c:any)=> {
-               // There is a related card pointing to itself
-               if (c.name === body.name) {
-                   return;
-               }
-               // If this is e.g. a partner card
-               if (c.component === "combo_piece") {
-                   return;
-               }
-               this.tokens.push({
-                   "name": c.name,
-                   "uri": c.uri
+        if (!this.uri && body.all_parts) {
+            body.all_parts.forEach((c: any) => {
+                // There is a related card pointing to itself
+                if (c.name === body.name) {
+                    return;
+                }
+                // If this is e.g. a partner card
+                if (c.component === "combo_piece") {
+                    return;
+                }
+                this.tokens.push({
+                    "name": c.name,
+                    "uri": c.uri
                 });
             });
         }
@@ -110,7 +123,7 @@ export default class Card {
             const json = await res.json();
             this.parseResults(json);
         } catch (err) {
-            console.log("ER1: Failed to get: "+this.name)
+            console.log("ER1: Failed to get: " + this.name)
             this.failed = true;
         }
     }
@@ -127,7 +140,7 @@ export default class Card {
 
     getCardObject(): TabletopObject {
         if (this.id === -1) {
-            throw Error("This card is invalid "+ this.name);
+            throw Error("This card is invalid " + this.name);
         }
         return {
             "CardID": this.id,

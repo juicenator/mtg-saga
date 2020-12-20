@@ -109,14 +109,3 @@ export async function getDeckFromURL(url: string): Promise<string[]> {
     return deck;
 }
 
-export function isValidHttpUrl(str: string): boolean {
-    let url;
-
-    try {
-        url = new URL(str);
-    } catch (_) {
-        return false;
-    }
-
-    return url.protocol === "http:" || url.protocol === "https:";
-}
