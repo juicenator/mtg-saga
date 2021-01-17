@@ -69,7 +69,7 @@ async function download(form: any): Promise<string> {
         tmpCard.setBackUrl(cardBack);
 
         if (hasCommander) {
-            let isCommander = compareToCommanders(commanders, tmpCard.name);
+            let isCommander = compareToCommanders(commanders, getName(tmpCard.name));
             if (isCommander) {
                 console.log("Found commander in decklist as well");
                 tmpCard.setCardType(CardType.Commander);
