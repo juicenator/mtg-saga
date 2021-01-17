@@ -1,4 +1,4 @@
-import Card, {SCRYFALL_CARD_BACK_IMAGE_URL} from './Card';
+import Card, {DEFAULT_CARD_BACK_IMAGE_URL} from './Card';
 import { CardType, generateTabletopOutput } from './Tabletop';
 import { getDeckFromURL } from './DeckURL';
 import { getName, getNumInstances, compareToCommanders, downloadPrompt } from './Utils';
@@ -18,7 +18,7 @@ async function download(form: any): Promise<string> {
     let partner: string = form.partner;
     let cardBack: string = form.cardback.trim(); 
     if (!isValidHttpUrl(cardBack)) {
-        cardBack = SCRYFALL_CARD_BACK_IMAGE_URL;
+        cardBack = DEFAULT_CARD_BACK_IMAGE_URL;
     }
 
     // CustomCardBack

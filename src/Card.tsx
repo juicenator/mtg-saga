@@ -1,12 +1,14 @@
 import { CardType, TabletopCard, TabletopObject } from './Tabletop';
 import { isValidHttpUrl } from './Utils';
 
-export const SCRYFALL_CARD_BACK_IMAGE_URL = "https://img.scryfall.com/errors/missing.jpg";
+export const MTGSAGA_BACK_IMAGE_URL = "https://imgur.com/GLn8lMl.jpg";
+export const CLASSIC_BACK_IMAGE_URL = "https://i.imgur.com/vHgirGT.jpg";
+export const DEFAULT_CARD_BACK_IMAGE_URL = MTGSAGA_BACK_IMAGE_URL;
 
 const FORMAT_MTGO = /(?<quantity>\d+)\s+(?<card>.*?)\s+\((?<set>.+)\)(\s+(?<number>\d+[ps]?))/;
 const FORMAT_MTGA = /(?<quantity>\d+)\s+(?<card>.*)/;
 
-let cardBack = SCRYFALL_CARD_BACK_IMAGE_URL;
+let cardBack = DEFAULT_CARD_BACK_IMAGE_URL;
 function getCardBack() {
     return cardBack;
 }
@@ -14,7 +16,7 @@ export function setCardBack(tmpCardBack: string) {
     if (tmpCardBack.trim() !== "" && isValidHttpUrl(tmpCardBack)) {
         cardBack = tmpCardBack;
     } else {
-        cardBack = SCRYFALL_CARD_BACK_IMAGE_URL;
+        cardBack = DEFAULT_CARD_BACK_IMAGE_URL;
     }
 }
 
@@ -40,8 +42,8 @@ export default class Card {
         this.name = name;
         this.numInstances = num_instances;
         this.cardType = type;
-        this.back_url = SCRYFALL_CARD_BACK_IMAGE_URL;
-        this.front_url = SCRYFALL_CARD_BACK_IMAGE_URL;
+        this.back_url = DEFAULT_CARD_BACK_IMAGE_URL;
+        this.front_url = DEFAULT_CARD_BACK_IMAGE_URL;
         this.uri = "";
         this.tokens = [];
         this.failed = false;
