@@ -65,14 +65,11 @@ async function download(form: any): Promise<string> {
         if (line === "" || line.startsWith("//")) {
             return;
         }
-        line = line.trim();
-        let numInstances = getNumInstances(line);
-        let name = getName(line);
-        let tmpCard = new Card(name, numInstances, CardType.Default);
+        let tmpCard = Card.fromLine(line.trim());
         tmpCard.setBackUrl(cardBack);
 
         if (hasCommander) {
-            let isCommander = compareToCommanders(commanders, name);
+            let isCommander = compareToCommanders(commanders, tmpCard.name);
             if (isCommander) {
                 console.log("Found commander in decklist as well");
                 tmpCard.setCardType(CardType.Commander);

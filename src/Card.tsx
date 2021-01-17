@@ -2,7 +2,6 @@ import { CardType, TabletopCard, TabletopObject } from './Tabletop';
 import { isValidHttpUrl } from './Utils';
 
 export const SCRYFALL_CARD_BACK_IMAGE_URL = "https://img.scryfall.com/errors/missing.jpg";
-const SCRYFALL_API_URL = "https://api.scryfall.com/cards/named?fuzzy=";
 
 const FORMAT_MTGO = /(?<quantity>\d+)\s+(?<card>.*?)\s+\((?<set>.+)\)(\s+(?<number>\d+[ps]?))/;
 const FORMAT_MTGA = /(?<quantity>\d+)\s+(?<card>.*)/;
@@ -32,7 +31,6 @@ export default class Card {
     cardType: CardType;
     back_url: string;
     front_url: string;
-    query: string;
     uri: string;
     tokens: Token[];
     failed: boolean;
@@ -44,7 +42,6 @@ export default class Card {
         this.cardType = type;
         this.back_url = SCRYFALL_CARD_BACK_IMAGE_URL;
         this.front_url = SCRYFALL_CARD_BACK_IMAGE_URL;
-        this.query = SCRYFALL_API_URL + '"' + name + '"';
         this.uri = "";
         this.tokens = [];
         this.failed = false;
@@ -124,13 +121,13 @@ export default class Card {
 
     async getCardPromise() {
         // if uri, do not query but directly get from uri
-        let query = this.uri ? this.uri : this.query;
+        let query = this.uri ? this.uri : this.getScryfallQueryUrl().toString();
         try {
             const res = await window.fetch(query);
             const json = await res.json();
             this.parseResults(json);
         } catch (err) {
-            console.log("ER1: Failed to get: " + this.name)
+            console.log("ER1: Failed to get: " + this.name);
             this.failed = true;
         }
     }
@@ -188,5 +185,17 @@ export default class Card {
         }
 
         return new Card(line, 1, type);
+    }
+
+    getScryfallQueryUrl(): URL {
+        console.log(this.collectorNumber, this.setCode);
+        if (this.collectorNumber && this.setCode) {
+            return new URL('https://api.scryfall.com/cards/'+this.setCode.toLowerCase()+'/'+this.collectorNumber);
+        }
+
+        const url = new URL('https://api.scryfall.com/cards/named');
+        url.searchParams.append('fuzzy', this.name);
+
+        return url;
     }
 }

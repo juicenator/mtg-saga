@@ -110,7 +110,7 @@ export default function InfoForm() {
                         name="errors"
                         label="Failed to get the following card(s)"
                         helperText={"Edit these in the textbox above and try again. " +
-                            "Follow the format: <number> <card name>"}
+                            "Follow the format: <number> <card name> or <number> <card name> (<set>) <collectorNumber>"}
                         value={errors}
                         InputLabelProps={{ shrink: true }}
                         fullWidth
