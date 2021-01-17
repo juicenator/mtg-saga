@@ -165,7 +165,6 @@ export default class Card {
     }
 
     static fromLine(line: string, type: CardType = CardType.Default): Card {
-        console.log(FORMAT_MTGO.test(line));
         if (FORMAT_MTGO.test(line)) {
             let m = FORMAT_MTGO.exec(line);
             if (m && m.groups) {
@@ -188,7 +187,6 @@ export default class Card {
     }
 
     getScryfallQueryUrl(): URL {
-        console.log(this.collectorNumber, this.setCode);
         if (this.collectorNumber && this.setCode) {
             return new URL('https://api.scryfall.com/cards/'+this.setCode.toLowerCase()+'/'+this.collectorNumber);
         }
