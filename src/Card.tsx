@@ -4,6 +4,9 @@ import { isValidHttpUrl } from './Utils';
 export const SCRYFALL_CARD_BACK_IMAGE_URL = "https://img.scryfall.com/errors/missing.jpg";
 const SCRYFALL_API_URL = "https://api.scryfall.com/cards/named?fuzzy=";
 
+const FORMAT_MTGO = /(?<quantity>\d+)\s+(?<card>.*?)\s+\((?<set>.+)\)(\s+(?<number>\d+[ps]?))/;
+const FORMAT_MTGA = /(?<quantity>\d+)\s+(?<card>.*)/;
+
 let cardBack = SCRYFALL_CARD_BACK_IMAGE_URL;
 function getCardBack() {
     return cardBack;
@@ -23,6 +26,8 @@ type Token = {
 
 export default class Card {
     name: string;
+    collectorNumber: string;
+    setCode: string;
     numInstances: number;
     cardType: CardType;
     back_url: string;
@@ -44,6 +49,8 @@ export default class Card {
         this.tokens = [];
         this.failed = false;
         this.id = -1;
+        this.collectorNumber = "";
+        this.setCode = "";
     }
 
     setFrontUrl(url: string) {
@@ -158,5 +165,28 @@ export default class Card {
                 "scaleZ": 1,
             }
         }
+    }
+
+    static fromLine(line: string, type: CardType = CardType.Default): Card {
+        console.log(FORMAT_MTGO.test(line));
+        if (FORMAT_MTGO.test(line)) {
+            let m = FORMAT_MTGO.exec(line);
+            if (m && m.groups) {
+                let card = new Card(m.groups.card, Number(m.groups.quantity), type);
+                card.collectorNumber = m.groups.number;
+                card.setCode = m.groups.set;
+
+                return card;
+            }
+        }
+
+        if (FORMAT_MTGA.test(line)) {
+            let m = FORMAT_MTGA.exec(line);
+            if (m && m.groups) {
+                return new Card(m.groups.card, Number(m.groups.quantity), type);
+            }
+        }
+
+        return new Card(line, 1, type);
     }
 }
