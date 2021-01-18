@@ -16,6 +16,7 @@ import step1 from './images/step-1.svg' // relative path to image
 import step2 from './images/step-2.svg' // relative path to image
 import step3 from './images/step-3.svg' // relative path to image
 import { FormGroup, Switch, FormControlLabel, Tooltip, SvgIcon, Paper, CardMedia, Card } from '@material-ui/core';
+import {DEFAULT_CARD_BACK_IMAGE_URL} from "./Card";
 
 export default function InfoForm() {
     const classes = useStyles();
@@ -228,7 +229,7 @@ export default function InfoForm() {
                             <FormControlLabel
                                 control={<Switch disabled={form.decklist === ""} checked={customCardBackChecked} onChange={(e) => {
                                     setCustomCardBackChecked(e.target.checked);
-                                    setForm({ ...form, "cardback": "https://imgur.com/GLn8lMl.jpg" });
+                                    setForm({ ...form, "cardback": DEFAULT_CARD_BACK_IMAGE_URL });
                                 }} name="cardback-switch" size="small" />}
                                 label="Custom Card Back"
                             />
@@ -250,7 +251,7 @@ export default function InfoForm() {
                                         }                             
                                     }}
                                     InputLabelProps={{ shrink: true }}
-                                    placeholder={"https://imgur.com/GLn8lMl.jpg"}
+                                    placeholder={DEFAULT_CARD_BACK_IMAGE_URL}
                                     helperText="Paste a URL to a card image with a ratio of 488 × 680"
                                     fullWidth
                                 />
@@ -303,7 +304,7 @@ export default function InfoForm() {
                         name="errors"
                         label="Failed to get the following card(s)"
                         helperText={"Edit these in the textbox above and try again. " +
-                            "Follow the format: <number> <card name>"}
+                            "Follow the format: <number> <card name> or <number> <card name> (<set>) <collectorNumber>"}
                         value={errors}
                         InputLabelProps={{ shrink: true }}
                         fullWidth

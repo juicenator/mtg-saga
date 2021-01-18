@@ -1,10 +1,11 @@
 import { CardType, TabletopCard, TabletopObject } from './Tabletop';
 import { isValidHttpUrl } from './Utils';
 
-export const SCRYFALL_CARD_BACK_IMAGE_URL = "https://img.scryfall.com/errors/missing.jpg";
-const SCRYFALL_API_URL = "https://api.scryfall.com/cards/named?fuzzy=";
+export const MTGSAGA_BACK_IMAGE_URL = "https://i.imgur.com/GLn8lMl.jpg";
+export const CLASSIC_BACK_IMAGE_URL = "https://i.imgur.com/vHgirGT.jpg";
+export const DEFAULT_CARD_BACK_IMAGE_URL = MTGSAGA_BACK_IMAGE_URL;
 
-let cardBack = SCRYFALL_CARD_BACK_IMAGE_URL;
+let cardBack = DEFAULT_CARD_BACK_IMAGE_URL;
 function getCardBack() {
     return cardBack;
 }
@@ -12,7 +13,7 @@ export function setCardBack(tmpCardBack: string) {
     if (tmpCardBack.trim() !== "" && isValidHttpUrl(tmpCardBack)) {
         cardBack = tmpCardBack;
     } else {
-        cardBack = SCRYFALL_CARD_BACK_IMAGE_URL;
+        cardBack = DEFAULT_CARD_BACK_IMAGE_URL;
     }
 }
 
@@ -23,11 +24,12 @@ type Token = {
 
 export default class Card {
     name: string;
+    collectorNumber: string;
+    expansionCode: string;
     numInstances: number;
     cardType: CardType;
     back_url: string;
     front_url: string;
-    query: string;
     uri: string;
     tokens: Token[];
     failed: boolean;
@@ -37,13 +39,14 @@ export default class Card {
         this.name = name;
         this.numInstances = num_instances;
         this.cardType = type;
-        this.back_url = SCRYFALL_CARD_BACK_IMAGE_URL;
-        this.front_url = SCRYFALL_CARD_BACK_IMAGE_URL;
-        this.query = SCRYFALL_API_URL + '"' + name + '"';
+        this.back_url = DEFAULT_CARD_BACK_IMAGE_URL;
+        this.front_url = DEFAULT_CARD_BACK_IMAGE_URL;
         this.uri = "";
         this.tokens = [];
         this.failed = false;
         this.id = -1;
+        this.collectorNumber = "";
+        this.expansionCode = "";
     }
 
     setFrontUrl(url: string) {
@@ -117,13 +120,13 @@ export default class Card {
 
     async getCardPromise() {
         // if uri, do not query but directly get from uri
-        let query = this.uri ? this.uri : this.query;
+        let query = this.uri ? this.uri : this.getScryfallQueryUrl().toString();
         try {
             const res = await window.fetch(query);
             const json = await res.json();
             this.parseResults(json);
         } catch (err) {
-            console.log("ER1: Failed to get: " + this.name)
+            console.log("ER1: Failed to get: " + this.name);
             this.failed = true;
         }
     }
@@ -158,5 +161,51 @@ export default class Card {
                 "scaleZ": 1,
             }
         }
+    }
+
+    /**
+     * Card factory from a line of text
+     *
+     * This method uses `RegExp` to validate usual decklist patterns, and then capture content parts
+     * through javascript regexp results `group` property.
+     * This allow a self-documenting RegExp, and a more readable code where named capture groups.
+     *
+     * @see https://javascript.info/regexp-groups
+     * @param line
+     * @param type
+     */
+    static fromLine(line: string, type: CardType = CardType.Default): Card {
+        const FORMAT_MTGO = /(?<quantity>\d+)\s+(?<card>.*?)\s+\((?<set>.+)\)(\s+(?<number>\d+[ps]?))/;
+        if (FORMAT_MTGO.test(line)) {
+            let m = FORMAT_MTGO.exec(line);
+            if (m && m.groups) {
+                let card = new Card(m.groups.card, Number(m.groups.quantity), type);
+                card.collectorNumber = m.groups.number;
+                card.expansionCode = m.groups.set;
+
+                return card;
+            }
+        }
+
+        const FORMAT_MTGA = /(?<quantity>\d+)\s+(?<card>.*)/;
+        if (FORMAT_MTGA.test(line)) {
+            let m = FORMAT_MTGA.exec(line);
+            if (m && m.groups) {
+                return new Card(m.groups.card, Number(m.groups.quantity), type);
+            }
+        }
+
+        return new Card(line, 1, type);
+    }
+
+    getScryfallQueryUrl(): URL {
+        if (this.collectorNumber && this.expansionCode) {
+            return new URL('https://api.scryfall.com/cards/'+this.expansionCode.toLowerCase()+'/'+this.collectorNumber);
+        }
+
+        const url = new URL('https://api.scryfall.com/cards/named');
+        url.searchParams.append('fuzzy', this.name);
+
+        return url;
     }
 }
