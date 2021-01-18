@@ -28,7 +28,7 @@ type Token = {
 export default class Card {
     name: string;
     collectorNumber: string;
-    setCode: string;
+    expansionCode: string;
     numInstances: number;
     cardType: CardType;
     back_url: string;
@@ -49,7 +49,7 @@ export default class Card {
         this.failed = false;
         this.id = -1;
         this.collectorNumber = "";
-        this.setCode = "";
+        this.expansionCode = "";
     }
 
     setFrontUrl(url: string) {
@@ -172,7 +172,7 @@ export default class Card {
             if (m && m.groups) {
                 let card = new Card(m.groups.card, Number(m.groups.quantity), type);
                 card.collectorNumber = m.groups.number;
-                card.setCode = m.groups.set;
+                card.expansionCode = m.groups.set;
 
                 return card;
             }
@@ -189,8 +189,8 @@ export default class Card {
     }
 
     getScryfallQueryUrl(): URL {
-        if (this.collectorNumber && this.setCode) {
-            return new URL('https://api.scryfall.com/cards/'+this.setCode.toLowerCase()+'/'+this.collectorNumber);
+        if (this.collectorNumber && this.expansionCode) {
+            return new URL('https://api.scryfall.com/cards/'+this.expansionCode.toLowerCase()+'/'+this.collectorNumber);
         }
 
         const url = new URL('https://api.scryfall.com/cards/named');
