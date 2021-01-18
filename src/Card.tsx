@@ -5,9 +5,6 @@ export const MTGSAGA_BACK_IMAGE_URL = "https://i.imgur.com/GLn8lMl.jpg";
 export const CLASSIC_BACK_IMAGE_URL = "https://i.imgur.com/vHgirGT.jpg";
 export const DEFAULT_CARD_BACK_IMAGE_URL = MTGSAGA_BACK_IMAGE_URL;
 
-const FORMAT_MTGO = /(?<quantity>\d+)\s+(?<card>.*?)\s+\((?<set>.+)\)(\s+(?<number>\d+[ps]?))/;
-const FORMAT_MTGA = /(?<quantity>\d+)\s+(?<card>.*)/;
-
 let cardBack = DEFAULT_CARD_BACK_IMAGE_URL;
 function getCardBack() {
     return cardBack;
@@ -166,7 +163,19 @@ export default class Card {
         }
     }
 
+    /**
+     * Card factory from a line of text
+     *
+     * This method uses `RegExp` to validate usual decklist patterns, and then capture content parts
+     * through javascript regexp results `group` property.
+     * This allow a self-documenting RegExp, and a more readable code where named capture groups.
+     *
+     * @see https://javascript.info/regexp-groups
+     * @param line
+     * @param type
+     */
     static fromLine(line: string, type: CardType = CardType.Default): Card {
+        const FORMAT_MTGO = /(?<quantity>\d+)\s+(?<card>.*?)\s+\((?<set>.+)\)(\s+(?<number>\d+[ps]?))/;
         if (FORMAT_MTGO.test(line)) {
             let m = FORMAT_MTGO.exec(line);
             if (m && m.groups) {
@@ -178,6 +187,7 @@ export default class Card {
             }
         }
 
+        const FORMAT_MTGA = /(?<quantity>\d+)\s+(?<card>.*)/;
         if (FORMAT_MTGA.test(line)) {
             let m = FORMAT_MTGA.exec(line);
             if (m && m.groups) {
