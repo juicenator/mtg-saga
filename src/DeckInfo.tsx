@@ -134,7 +134,7 @@ export default function InfoForm() {
                                     "OR\n" +
                                     "1 Aether Hub\n" +
                                     "1 Anointed Procession\n" +
-                                    "6 Island\n" +
+                                    "6 Island (thb) 251\n" +
                                     "...."}
                                 fullWidth
                                 multiline
