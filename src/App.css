@@ -34,3 +34,18 @@ body {
   width:122px;
   height:170px;
 }
+
+.HoverButton {
+  padding: 0;
+  background: none;
+  margin: 0;
+  border: none;
+  color: #f50057;
+}
+
+.HoverButton :hover {
+  color: white;
+  background: #f50057;
+  border-radius: 5;
+  text-decoration: none;
+}

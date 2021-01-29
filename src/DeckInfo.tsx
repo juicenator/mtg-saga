@@ -10,13 +10,13 @@ import LaptopWindowsIcon from '@material-ui/icons/LaptopWindows';
 import download from './DeckBuilder';
 import useStyles from './Styles';
 
-import {isValidHttpUrl} from './Utils';
+import { isValidHttpUrl } from './Utils';
 
 import step1 from './images/step-1.svg' // relative path to image
 import step2 from './images/step-2.svg' // relative path to image
 import step3 from './images/step-3.svg' // relative path to image
 import { FormGroup, Switch, FormControlLabel, Tooltip, SvgIcon, Paper, CardMedia, Card } from '@material-ui/core';
-import {DEFAULT_CARD_BACK_IMAGE_URL} from "./Card";
+import { DEFAULT_CARD_BACK_IMAGE_URL } from "./Card";
 
 export default function InfoForm() {
     const classes = useStyles();
@@ -244,11 +244,11 @@ export default function InfoForm() {
                                     onChange={(e) => {
                                         setForm({ ...form, "cardback": e.target.value })
                                         // test if correct url, if so, set download on OK
-                                        if (!isValidHttpUrl(e.target.value)){
+                                        if (!isValidHttpUrl(e.target.value)) {
                                             setDisabled(true);
                                         } else {
                                             setDisabled(false);
-                                        }                             
+                                        }
                                     }}
                                     InputLabelProps={{ shrink: true }}
                                     placeholder={DEFAULT_CARD_BACK_IMAGE_URL}
@@ -288,11 +288,23 @@ export default function InfoForm() {
                         >
                             Download Tabletop Simulator file
                     </Button>
+                        {/* <Grid item xs={12}> */}
+                            {/* <Typography */}
+                                {/* variant={"caption"}> */}
+                                {/* Downloading may take a couple of seconds. */}
+                            {/* </Typography> */}
+                        {/* </Grid> */}
+                        {/* <br /> */}
                         <Grid item xs={12}>
                             <Typography
-                                variant={"caption"}>
-                                Downloading may take a couple of seconds.
-                    </Typography>
+                                variant={"body2"}>
+                                <form id="donate" action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
+                                    <input type="hidden" name="cmd" value="_s-xclick" />
+                                    <input type="hidden" name="encrypted" value="-----BEGIN PKCS7-----MIIHdwYJKoZIhvcNAQcEoIIHaDCCB2QCAQExggEwMIIBLAIBADCBlDCBjjELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAkNBMRYwFAYDVQQHEw1Nb3VudGFpbiBWaWV3MRQwEgYDVQQKEwtQYXlQYWwgSW5jLjETMBEGA1UECxQKbGl2ZV9jZXJ0czERMA8GA1UEAxQIbGl2ZV9hcGkxHDAaBgkqhkiG9w0BCQEWDXJlQHBheXBhbC5jb20CAQAwDQYJKoZIhvcNAQEBBQAEgYA+Yfo2etYNcZKxkgyjMIG8nbX7WjwJ/g9Pr19jKkL8BYj43khi3Ws1A6UY6dVleo6Pj6SEq1K0uXqkU9Q2XYQFXCQKKaXay7DOgc4xKfKCnCxG6IsNArHhNaZ6wXQ7auxfNCO5ba8/FoxAkGUjbMkjnkGAjkl6OmiIi3J5oz+TZDELMAkGBSsOAwIaBQAwgfQGCSqGSIb3DQEHATAUBggqhkiG9w0DBwQIeu/5NG8z9z+AgdBKBnZXMTyZLmQpGNb1s04NyA/AMrcO/f8IVKi3QlJfMZxemEd7jPIwiv+7p5Uy97Kpc97/NpAPqooJIVHYEz9u7Q/KWAASLIWFoC9JRw/XExfVixcGG5xKGzvpEvVfkraSs6Di0bCpV1DnT/TLdx1Ns98ITwxkMmaJwzjrrwhjYwV8QcOAo7eDAq2sC/OW24jG4I57vTrYE33KBgsduyubyIvrzctKl5YAZWXvn1diwPhlhTb7h4mKjlKgI8eF2hS/RAYqIE2FpTzvCJVD8TYqoIIDhzCCA4MwggLsoAMCAQICAQAwDQYJKoZIhvcNAQEFBQAwgY4xCzAJBgNVBAYTAlVTMQswCQYDVQQIEwJDQTEWMBQGA1UEBxMNTW91bnRhaW4gVmlldzEUMBIGA1UEChMLUGF5UGFsIEluYy4xEzARBgNVBAsUCmxpdmVfY2VydHMxETAPBgNVBAMUCGxpdmVfYXBpMRwwGgYJKoZIhvcNAQkBFg1yZUBwYXlwYWwuY29tMB4XDTA0MDIxMzEwMTMxNVoXDTM1MDIxMzEwMTMxNVowgY4xCzAJBgNVBAYTAlVTMQswCQYDVQQIEwJDQTEWMBQGA1UEBxMNTW91bnRhaW4gVmlldzEUMBIGA1UEChMLUGF5UGFsIEluYy4xEzARBgNVBAsUCmxpdmVfY2VydHMxETAPBgNVBAMUCGxpdmVfYXBpMRwwGgYJKoZIhvcNAQkBFg1yZUBwYXlwYWwuY29tMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDBR07d/ETMS1ycjtkpkvjXZe9k+6CieLuLsPumsJ7QC1odNz3sJiCbs2wC0nLE0uLGaEtXynIgRqIddYCHx88pb5HTXv4SZeuv0Rqq4+axW9PLAAATU8w04qqjaSXgbGLP3NmohqM6bV9kZZwZLR/klDaQGo1u9uDb9lr4Yn+rBQIDAQABo4HuMIHrMB0GA1UdDgQWBBSWn3y7xm8XvVk/UtcKG+wQ1mSUazCBuwYDVR0jBIGzMIGwgBSWn3y7xm8XvVk/UtcKG+wQ1mSUa6GBlKSBkTCBjjELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAkNBMRYwFAYDVQQHEw1Nb3VudGFpbiBWaWV3MRQwEgYDVQQKEwtQYXlQYWwgSW5jLjETMBEGA1UECxQKbGl2ZV9jZXJ0czERMA8GA1UEAxQIbGl2ZV9hcGkxHDAaBgkqhkiG9w0BCQEWDXJlQHBheXBhbC5jb22CAQAwDAYDVR0TBAUwAwEB/zANBgkqhkiG9w0BAQUFAAOBgQCBXzpWmoBa5e9fo6ujionW1hUhPkOBakTr3YCDjbYfvJEiv/2P+IobhOGJr85+XHhN0v4gUkEDI8r2/rNk1m0GA8HKddvTjyGw/XqXa+LSTlDYkqI8OwR8GEYj4efEtcRpRYBxV8KxAW93YDWzFGvruKnnLbDAF6VR5w/cCMn5hzGCAZowggGWAgEBMIGUMIGOMQswCQYDVQQGEwJVUzELMAkGA1UECBMCQ0ExFjAUBgNVBAcTDU1vdW50YWluIFZpZXcxFDASBgNVBAoTC1BheVBhbCBJbmMuMRMwEQYDVQQLFApsaXZlX2NlcnRzMREwDwYDVQQDFAhsaXZlX2FwaTEcMBoGCSqGSIb3DQEJARYNcmVAcGF5cGFsLmNvbQIBADAJBgUrDgMCGgUAoF0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMTgwNDEyMjA0NDM1WjAjBgkqhkiG9w0BCQQxFgQU13xil9koRUxidFfeyZNxmsfH3aAwDQYJKoZIhvcNAQEBBQAEgYATTO2hnozWzi7B8XXXsovWZ4HZjVi+QyVd3BCXv85HHsLRkBUVaHxGCWBcXcnvqTtEGb6bBUeqoJT+GL19WPfOmVdEIIA5Zdc1gkae6NvU7UCYfcDgyKTaTQxhK2bH3Q2iQqzbTdiOSd4KWQF7baHetlhU+e4W3ZhdUEru2pXEHQ==-----END PKCS7-----" />
+                                        Please help support this website and consider <button type="submit" className={"HoverButton"}
+                                    ><b><u>donating</u></b></button>
+                                </form>
+                            </Typography>
                         </Grid>
                     </Grid>
                 </Grid>
