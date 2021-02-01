@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {ReactElement, useState} from 'react';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
@@ -10,12 +10,10 @@ import useStyles from './Styles';
 import step1 from './images/step-1.svg' // relative path to image
 import step2 from './images/step-2.svg' // relative path to image
 import step3 from './images/step-3.svg' // relative path to image
-import { Paper, FormControl } from '@material-ui/core';
+import {Paper, FormControl, MenuItemTypeMap} from '@material-ui/core';
 
 import preconDecks from './precon/decks.json'
 import { Select, MenuItem, FormGroup } from '@material-ui/core';
-
-const SELECT_A_DECK = "Select a deck";
 
 class PreconDeck {
     key!: string;
@@ -24,6 +22,8 @@ class PreconDeck {
     commanders!: string[];
     decklist!: string[];
 }
+
+const SELECT_A_DECK = 'Select a deck';
 
 function selectPreconDeck(decks: PreconDeck[], id: any): PreconDeck {
     let selectedDeck: PreconDeck = new PreconDeck();
@@ -35,20 +35,22 @@ function selectPreconDeck(decks: PreconDeck[], id: any): PreconDeck {
     return selectedDeck;
 }
 
+// You should not build you PreconDeck list inside the component, since they are rebuilt everytime it is refreshed.
+// react use strict equality (same object) so you should never recreate items that are stored in states.
+let decks: PreconDeck[] = [];
+preconDecks.decks.forEach(deckJsonDefinition => {
+    let tmpDeck = Object.assign(new PreconDeck(), deckJsonDefinition);
+    tmpDeck.key = tmpDeck.set.toLowerCase() + ":" + tmpDeck.name.toLowerCase();
+    decks.push(tmpDeck);
+});
+
 export default function PreconForm() {
     const classes = useStyles();
-    const [selectedDeckState, setSelectedDeck] = useState({deck: new PreconDeck()});
+    const [selectedDeckState, setSelectedDeck] = useState<PreconDeck>();
     const [form, setForm] = useState({ "commander": "", "partner": "", "decklist": "", "sideboard": "", "cardback": "" });
     const [disabled, setDisabled] = useState(false);
     const [errors, setErrors] = useState("");
 
-    let decks: PreconDeck[] = [];
-    preconDecks.decks.forEach(deck => {
-        let tmpDeck = Object.assign(new PreconDeck(), deck)
-        tmpDeck.key = tmpDeck.set.toLowerCase() + ":" + tmpDeck.name.toLowerCase();
-        decks.push(tmpDeck);
-    });
-    
     return (
         <Paper className={classes.paper}>
             <Typography component="h1" variant="h4" align="center">
@@ -68,25 +70,24 @@ export default function PreconForm() {
                     <FormControl>
                         <Select
                             id="set-select"
-                            value={selectedDeckState.deck.key}
-                            defaultValue={SELECT_A_DECK}
+                            value={selectedDeckState ?? SELECT_A_DECK}
                             fullWidth
-                            onChange={e => {
-                                // Select the deck from the JSON
-                                let selectedKey = Object.assign(new PreconDeck(), e.target.value);
-                                selectedKey.key = selectedKey.set.toLowerCase() + ":" + selectedKey.name.toLowerCase();
-                                let selectedDeck = selectPreconDeck(decks, selectedKey.key);
-                                setSelectedDeck({deck: selectedDeck});
-                                let partner: string = "";
-                                let commander = selectedDeck.commanders[0];
-                                if (selectedDeck.commanders.length > 1) {
-                                    partner = selectedDeck.commanders[1];
-                                }
-                                // Set the deck form
-                                setForm({ ...form, commander: commander, partner: partner, decklist: selectedDeck.decklist.join("\n") })
+                            onChange={(e: React.ChangeEvent<{ value: unknown }>) => {
+                                // Since MUI Select in not a real select element you will need to cast e.target.value
+                                // using as Type and type the handler as React.ChangeEvent<{ value: unknown }>
+                                // See https://stackoverflow.com/a/58676067/1053961
+                                let deck = e.target.value as PreconDeck;
+                                setForm({
+                                    ...form,
+                                    commander: deck.commanders[0],
+                                    partner: deck.commanders[1],
+                                    decklist: deck.decklist.join("\n")
+                                });
+                                setSelectedDeck(deck);
                             }}
                         >
-                            {preconDecks.decks.map((deck: any) => <MenuItem key={deck.key} value={deck}>{deck.set + ": " + deck.name}</MenuItem>)}
+                            <MenuItem key="default" value={SELECT_A_DECK}>{SELECT_A_DECK}</MenuItem>
+                            {decks.map((deck: any) => <MenuItem key={deck.key} value={deck}>{deck.set + ": " + deck.name}</MenuItem>)}
                         </Select>
                     </FormControl>
                 </Grid>
