@@ -21,6 +21,7 @@ class PreconDeck {
     name!: string;
     commanders!: string[];
     decklist!: string[];
+    date!: any;
 }
 
 const SELECT_A_DECK = 'Select a deck';
@@ -41,8 +42,10 @@ let decks: PreconDeck[] = [];
 preconDecks.decks.forEach(deckJsonDefinition => {
     let tmpDeck = Object.assign(new PreconDeck(), deckJsonDefinition);
     tmpDeck.key = tmpDeck.set.toLowerCase() + ":" + tmpDeck.name.toLowerCase();
+    tmpDeck.date = new Date(tmpDeck.date);
     decks.push(tmpDeck);
 });
+decks.sort((a: PreconDeck, b: PreconDeck) => b.date - a.date) // if b is later, this returns 1, if earlier it returns -1
 
 export default function PreconForm() {
     const classes = useStyles();
@@ -80,7 +83,7 @@ export default function PreconForm() {
                                 setForm({
                                     ...form,
                                     commander: deck.commanders[0],
-                                    partner: deck.commanders[1],
+                                    partner: deck.commanders[1] ? deck.commanders[1]: "",
                                     decklist: deck.decklist.join("\n")
                                 });
                                 setSelectedDeck(deck);
