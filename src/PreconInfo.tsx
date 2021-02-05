@@ -80,12 +80,22 @@ export default function PreconForm() {
                                 // using as Type and type the handler as React.ChangeEvent<{ value: unknown }>
                                 // See https://stackoverflow.com/a/58676067/1053961
                                 let deck = e.target.value as PreconDeck;
-                                setForm({
-                                    ...form,
-                                    commander: deck.commanders[0],
-                                    partner: deck.commanders[1] ? deck.commanders[1]: "",
-                                    decklist: deck.decklist.join("\n")
-                                });
+                                if (!deck.commanders) {
+                                    // Default PreconDeck is an empty one with no commander, in this case we explicitely reset the form
+                                    setForm({
+                                        ...form,
+                                        commander: "",
+                                        partner: "",
+                                        decklist: ""
+                                    });
+                                } else {
+                                    setForm({
+                                        ...form,
+                                        commander: deck.commanders[0] ? deck.commanders[0]: "",
+                                        partner: deck.commanders[1] ? deck.commanders[1]: "",
+                                        decklist: deck.decklist.join("\n")
+                                    });
+                                }
                                 setSelectedDeck(deck);
                             }}
                         >
