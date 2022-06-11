@@ -116,16 +116,17 @@ async function download(form: any): Promise<string> {
     // Postprocess tokens, flip and additional cards
     let postPromises: any[] = [];
     let tokens: { [key: string]: boolean } = {};
+    let flips: { [key: string]: boolean } = {};
 
     cards.forEach(card => {
         // Handle tokens
         if (card.tokens.length !== 0) {
             card.tokens.forEach((token: any) => {
                 // if this token is already present in the list.
-                if (token.name in tokens) {
+                if (token.uri in tokens) {
                     return;
                 }
-                tokens[token.name] = true;
+                tokens[token.uri] = true;
                 let tmpCard = new Card("", 1, CardType.Additional);
                 tmpCard.setUri(token.uri);
                 cards.push(tmpCard);
@@ -135,7 +136,7 @@ async function download(form: any): Promise<string> {
         // Handle flip cards
         if (card.cardType === CardType.Flip) {
             // if we already have a double backed token for this card we just modify this one to go in the main deck.
-            if (card.name in tokens) {
+            if (card.name in flips) {
                 card.setCardType(CardType.Default);
                 card.setBackUrl("");
                 return;
@@ -150,7 +151,7 @@ async function download(form: any): Promise<string> {
             // make sure 1 double faced card gets put in the token stack
             card.setCardType(CardType.Additional);
             card.setNumInstances(1);
-            tokens[card.name] = true;
+            flips[card.name] = true;
         }
     });
 
