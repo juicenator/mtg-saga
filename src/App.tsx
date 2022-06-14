@@ -57,7 +57,7 @@ function App() {
               </Button>
           </Link> */}
 
-          { 
+          {/* 
           <Link href="/precon" style={{ textDecoration: 'none', marginRight: ".5%" }} color="inherit">
             <Button
               type="submit"
@@ -68,7 +68,7 @@ function App() {
             >
               Precon Decks
               </Button>
-          </Link> }
+          </Link> */}
 
           <form id="donate" action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
             <input type="hidden" name="cmd" value="_s-xclick" />
