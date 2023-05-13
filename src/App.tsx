@@ -1,8 +1,13 @@
 import React from 'react';
-import { CssBaseline, AppBar, Toolbar, Button, Link, Typography } from '@mui/material';
+
+// Pages
 import DeckInfo from './DeckInfo';
+import ErrorPage from './ErrorPage';
+
+// Styles and meterial
 import useStyles from './Styles';
 import './App.css';
+import { CssBaseline, AppBar, Toolbar, Button, Link, Typography } from '@mui/material';
 
 import {
   createBrowserRouter,
@@ -14,6 +19,7 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <DeckInfo />,
+    errorElement: <ErrorPage />,
   },
 ]);
 
