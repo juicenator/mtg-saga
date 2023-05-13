@@ -31,7 +31,7 @@ export default function InfoForm() {
 
     return (
         <Paper className={classes.paper}>
-            <Typography component="h1" variant="h4" align="center" style={{"paddingBottom": "10px"}}>
+            <Typography component="h1" variant="h4" align="center" style={{ "paddingBottom": "10px" }}>
                 Deck Information
             </Typography>
             {/* Main container */}
@@ -84,7 +84,7 @@ export default function InfoForm() {
                                     label="Partner"
                                 />
                             </Grid>
-                            <Grid item container xs={8}>
+                            <Grid item container xs={8} style={{ paddingTop: "10px" }}>
                                 {checked ? <TextField
                                     id="partner"
                                     name="partner"
@@ -152,7 +152,7 @@ export default function InfoForm() {
                     <Grid xs={12} item container direction="row">
                         <Grid item container xs={1}> </Grid>
                         <Grid item container xs={11} flexDirection="row">
-                            <Grid item container xs={9}>
+                            <Grid item container xs={10}>
                                 <TextField
                                     id="decklist"
                                     name="decklist"
@@ -176,7 +176,7 @@ export default function InfoForm() {
                             </Grid>
 
                             {/* Switches Sideboard and card back*/}
-                            <Grid container item>
+                            <Grid container item style={{ "paddingLeft": "10px" }}>
                                 <FormGroup row>
                                     <FormControlLabel
                                         control={
@@ -206,65 +206,73 @@ export default function InfoForm() {
                             <Grid item container style={{ "height": "20px" }}> </Grid>
 
                             {/* Sideboard */}
-                            {sideboardEnabled ? <Grid container item xs={9}>
-                                <TextField
-                                    id="sideboard"
-                                    name="sideboard"
-                                    label="Sideboard"
-                                    value={form.sideboard}
-                                    onChange={(e) => {
-                                        setForm({ ...form, "sideboard": e.target.value })
-                                    }}
-                                    InputLabelProps={{ shrink: true }}
-                                    placeholder={
-                                        "1 Stolen by the Fae\n" +
-                                        "1 Prismite\n" +
-                                        "6 Plains\n" +
-                                        "...."}
-                                    fullWidth
-                                    multiline
-                                    rows={4}
-                                    variant={"outlined"}
-                                />
-                            </Grid> : null}
+                            {sideboardEnabled ?
+                                <Grid item container xs={10}>
+                                    <Grid item container style={{ "height": "10px" }}> </Grid>
 
-                            <Grid item container style={{ "height": "20px" }}> </Grid>
+                                    <Grid container item>
+                                        <TextField
+                                            id="sideboard"
+                                            name="sideboard"
+                                            label="Sideboard"
+                                            value={form.sideboard}
+                                            onChange={(e) => {
+                                                setForm({ ...form, "sideboard": e.target.value })
+                                            }}
+                                            InputLabelProps={{ shrink: true }}
+                                            placeholder={
+                                                "1 Stolen by the Fae\n" +
+                                                "1 Prismite\n" +
+                                                "6 Plains\n" +
+                                                "...."}
+                                            fullWidth
+                                            multiline
+                                            rows={4}
+                                            variant={"outlined"}
+                                        />
+                                    </Grid>
+                                </Grid> : null}
+
 
                             {/* Custom card back */}
                             {customCardBackChecked ?
-                                <Grid item container xs={11} direction="row" justifyContent="space-between">
-                                    <TextField
-                                        id="cardback"
-                                        name="cardback"
-                                        label="Custom Card Back"
-                                        value={form.cardback}
-                                        onChange={(e) => {
-                                            setForm({ ...form, "cardback": e.target.value })
-                                            // test if correct url, if so, set download on OK
-                                            if (!isValidHttpUrl(e.target.value)) {
-                                                setDisabled(true);
-                                            } else {
-                                                setDisabled(false);
-                                            }
-                                        }}
-                                        InputLabelProps={{ shrink: true }}
-                                        placeholder={DEFAULT_CARD_BACK_IMAGE_URL}
-                                        helperText="Paste a URL to a card image with a ratio of 488 × 680"
-                                        fullWidth
-                                        variant="standard"
-                                        style={{ paddingRight: "10px", width: "auto" }}
-                                    />
-                                    <Card className={"CardBack"}>
-                                        <CardMedia image={form.cardback} className={"CardBack"}>
-                                        </CardMedia>
-                                    </Card>
+                                <Grid item container xs={12}>
+                                    <Grid item container style={{ "height": "10px" }}> </Grid>
+
+                                    <Grid item container xs={11} direction="row" justifyContent="space-between">
+                                        <TextField
+                                            id="cardback"
+                                            name="cardback"
+                                            label="Custom Card Back"
+                                            value={form.cardback}
+                                            onChange={(e) => {
+                                                setForm({ ...form, "cardback": e.target.value })
+                                                // test if correct url, if so, set download on OK
+                                                if (!isValidHttpUrl(e.target.value)) {
+                                                    setDisabled(true);
+                                                } else {
+                                                    setDisabled(false);
+                                                }
+                                            }}
+                                            InputLabelProps={{ shrink: true }}
+                                            placeholder={DEFAULT_CARD_BACK_IMAGE_URL}
+                                            helperText="Paste a URL to a card image with a ratio of 488 × 680"
+                                            fullWidth
+                                            variant="standard"
+                                            style={{ paddingRight: "10px", width: "auto" }}
+                                        />
+                                        <Card className={"CardBack"}>
+                                            <CardMedia image={form.cardback} className={"CardBack"}>
+                                            </CardMedia>
+                                        </Card>
+                                    </Grid>
                                 </Grid>
                                 : null}
                         </Grid>
                     </Grid>
                 </Grid>
 
-                <Grid item container style={{ "height": "20px" }}> </Grid>
+                <Grid item container style={{ "height": "10px" }}> </Grid>
 
                 {/* Step 3: Download and install instructions */}
                 <Grid container spacing={1}>
