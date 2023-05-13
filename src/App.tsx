@@ -2,13 +2,20 @@ import React from 'react';
 import { CssBaseline, AppBar, Toolbar, Button, Link, Typography } from '@mui/material';
 import DeckInfo from './DeckInfo';
 import useStyles from './Styles';
-import { Router, RouteComponentProps } from "@reach/router";
 import './App.css';
 
+import {
+  createBrowserRouter,
+  RouterProvider,
+} from "react-router-dom";
 
-const RouterPage = (
-  props: { pageComponent: JSX.Element } & RouteComponentProps
-) => props.pageComponent;
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <DeckInfo />,
+  },
+]);
 
 function Copyright() {
   return (
@@ -57,9 +64,7 @@ function App() {
         </Toolbar>
       </AppBar>
       <main className={classes.layout}>
-        <Router>
-          <RouterPage path="/" pageComponent={<DeckInfo />} />
-        </Router>
+          <RouterProvider router={router} />
         <Copyright />
       </main>
     </React.Fragment>
