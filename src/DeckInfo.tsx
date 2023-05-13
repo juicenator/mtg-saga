@@ -4,8 +4,9 @@ import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import Button from "@mui/material/Button";
 import Icon from '@mui/material/Icon';
-// import AppleIcon from '@material-ui/icons/Apple';
-// import LaptopWindowsIcon from '@material-ui/icons/LaptopWindows';
+
+import AppleIcon from '@mui/icons-material/Apple';
+import LaptopWindowsIcon from '@mui/icons-material/LaptopWindows';
 
 import download from './DeckBuilder';
 import useStyles from './Styles';
@@ -285,41 +286,37 @@ export default function InfoForm() {
                             {/* <br /> */}
                         </Grid>
                     </Grid>
-
-                    {/* Installation */}
-                    <Grid item container direction="row" spacing={1}>
-                        <Grid item xs={1}>
-                        </Grid>
-                        <Grid item xs={11}>
-                            <Typography variant="caption">
+                    
+                    {/* Installation instructions */}
+                    <Grid item container direction="row" style={{ paddingLeft: "30px" }}>
+                            <Typography variant="caption"> 
                                 Save the output file in the Tabletop Simulator folder:
                             </Typography>
+                        <Grid item container direction="row" spacing={1}>
+                            <Grid item xs={1}>
+                                <Typography variant="caption">
+                                    <SvgIcon>
+                                        <LaptopWindowsIcon aria-label="windows"/>
+                                    </SvgIcon>
+                                </Typography>
+                            </Grid>
+                            <Grid item xs={11}>
+                                <Typography variant="caption" className={"Wrap"}>
+                                    C:\Users\YOUR_NAME\Documents\My Games\Tabletop Simulator\Saves\Saved Objects\
+                                </Typography>
+                            </Grid>
                         </Grid>
-                    </Grid>
-                    <Grid item container direction="row" spacing={1}>
-                        <Grid item xs={1}>
-                            <Typography variant="caption">
+                        <Grid item container direction="row" spacing={1}>
+                            <Grid item xs={1}>
                                 <SvgIcon>
-                                    Windows
+                                    <AppleIcon aria-label="mac"/>
                                 </SvgIcon>
-                            </Typography>
-                        </Grid>
-                        <Grid item xs={11}>
-                            <Typography variant="caption" className={"Wrap"}>
-                                C:\Users\YOUR_NAME\Documents\My Games\Tabletop Simulator\Saves\Saved Objects\
-                            </Typography>
-                        </Grid>
-                    </Grid>
-                    <Grid item container direction="row" spacing={1}>
-                        <Grid item xs={1}>
-                            <SvgIcon>
-                                Mac
-                            </SvgIcon>
-                        </Grid>
-                        <Grid item xs={11}>
-                            <Typography variant="caption" className={"Wrap"}>
-                                ~/Library/Tabletop Simulator/Saves/Saved Objects/
-                            </Typography>
+                            </Grid>
+                            <Grid item xs={11}>
+                                <Typography variant="caption" className={"Wrap"}>
+                                    ~/Library/Tabletop Simulator/Saves/Saved Objects/
+                                </Typography>
+                            </Grid>
                         </Grid>
                     </Grid>
                 </Grid>
