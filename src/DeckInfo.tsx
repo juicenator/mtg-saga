@@ -217,13 +217,10 @@ export default function InfoForm() {
 
                 <Grid item> </Grid>
 
-                {/* Step 2.5: Custom card back */}
-                <Grid item container direction="row">
-                    <Grid item xs={1}>
-                    </Grid>
-                    <Grid item container xs={11} direction="row">
+                {/* Custom card back */}
+                <Grid item container direction="row" style={{ paddingLeft: "30px" }}>
                         {customCardBackChecked ?
-                            <Grid item container xs={11} direction="row">
+                            <Grid item container xs={11} direction="row" justifyContent="space-between">
                                 <TextField
                                     id="cardback"
                                     name="cardback"
@@ -243,6 +240,7 @@ export default function InfoForm() {
                                     helperText="Paste a URL to a card image with a ratio of 488 × 680"
                                     fullWidth
                                     variant="standard"
+                                    style={{ paddingRight: "10px", width: "auto" }}
                                 />
                                 <Card className={"CardBack"}>
                                     <CardMedia image={form.cardback} className={"CardBack"}>
@@ -250,7 +248,6 @@ export default function InfoForm() {
                                 </Card>
                             </Grid>
                             : null}
-                    </Grid>
                 </Grid>
 
                 <Grid item > </Grid>
