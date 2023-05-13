@@ -4,7 +4,7 @@ Any help is appreciated. See the [issues](https://github.com/antonsteenvoorden/m
 
 ## Developing
 This repository is written in [TypeScript](https://www.typescriptlang.org/) and requires the [Node Package Manager](https://www.npmjs.com/).  
-To get started, first install dependencies listed in `package.json` by running `npm install`.  
+To get started, first install dependencies listed in `package.json` by running `npm install --legacy-peer-deps`.  
 Start your local development serve with `npm start`.
 
 ### Some explanations
