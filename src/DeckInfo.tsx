@@ -31,117 +31,128 @@ export default function InfoForm() {
 
     return (
         <Paper className={classes.paper}>
-            <Typography component="h1" variant="h4" align="center">
+            <Typography component="h1" variant="h4" align="center" style={{"paddingBottom": "10px"}}>
                 Deck Information
             </Typography>
             {/* Main container */}
             <Grid item container direction="row" spacing={1}>
 
                 {/* Step 1: Who is your commander */}
-                <Grid container>
+                <Grid container spacing={1}>
                     {/* Icon and Title */}
-                    <Grid container direction="row" alignItems="start">
-                        <Icon className={"Step-container"}>
-                            <img className={"Step"} src={step1} alt="step-1" />
-                        </Icon>
-                        <Typography variant="h6">
-                            Optional: Who is your Commander?
-                        </Typography>
+                    <Grid container item direction="row" alignItems="start" xs={12}>
+                        <Grid container item xs={1}>
+                            <Icon className={"Step-container"}>
+                                <img className={"Step"} src={step1} alt="step-1" />
+                            </Icon>
+                        </Grid>
+                        <Grid container item xs={11}>
+                            <Typography variant="h6">
+                                Optional: Who is your Commander? <br />
+                            </Typography>
+                            <Typography variant="caption">
+                                Will be spawned next to the deck for convenience!
+                            </Typography>
+                        </Grid>
                     </Grid>
 
                     {/* Select command and partner */}
-                    <Grid item xs={11} style={{ paddingLeft: "30px" }}>
-                        <FormGroup row>
-                            <Grid item xs={8} container>
-                                <TextField
-                                    id="commander"
-                                    name="commander"
-                                    label="Commander"
-                                    value={form.commander}
-                                    onChange={(e) => {
-                                        setForm({ ...form, "commander": e.target.value })
-                                    }}
-                                    InputLabelProps={{ shrink: true }}
-                                    placeholder={"Alela, Artful Provocateur"}
-                                    helperText="Will be spawned next to the deck for convenience!"
-                                    fullWidth
-                                    variant="standard"
+                    <Grid xs={12} item container direction="row">
+                        <Grid item container xs={1}> </Grid>
+                        <Grid item container xs={11} flexDirection="row">
+                            <Grid item container flexDirection="row" justifyContent="space-between">
+                                <Grid item container xs={8}>
+                                    <TextField
+                                        id="commander"
+                                        name="commander"
+                                        label="Commander"
+                                        value={form.commander}
+                                        onChange={(e) => {
+                                            setForm({ ...form, "commander": e.target.value })
+                                        }}
+                                        InputLabelProps={{ shrink: true }}
+                                        placeholder={"Alela, Artful Provocateur"}
+                                        fullWidth
+                                        variant="standard"
+                                    />
+                                </Grid>
+                                <FormControlLabel
+                                    control={<Switch disabled={form.commander === ""} checked={checked} onChange={(e) => {
+                                        setChecked(e.target.checked);
+                                        setForm({ ...form, "partner": "" });
+                                    }} name="partner-switch" size="small" />}
+                                    label="Partner"
                                 />
                             </Grid>
-                            <span style={{ flex: 1 }}></span>
-                            <FormControlLabel
-                                control={<Switch disabled={form.commander === ""} checked={checked} onChange={(e) => {
-                                    setChecked(e.target.checked);
-                                    setForm({ ...form, "partner": "" });
-                                }} name="partner-switch" size="small" />}
-                                label="Partner"
-                            />
-                            {checked ? <TextField
-                                id="partner"
-                                name="partner"
-                                label="Partner"
-                                value={form.partner}
-                                onChange={(e) => {
-                                    setForm({ ...form, "partner": e.target.value })
-                                }}
-                                InputLabelProps={{ shrink: true }}
-                                placeholder={"Kydele, Chosen of Kruphix"}
-                                fullWidth
-                                variant="standard"
-                            /> : null}
-                        </FormGroup>
+                            <Grid item container xs={8}>
+                                {checked ? <TextField
+                                    id="partner"
+                                    name="partner"
+                                    label="Partner"
+                                    value={form.partner}
+                                    onChange={(e) => {
+                                        setForm({ ...form, "partner": e.target.value })
+                                    }}
+                                    InputLabelProps={{ shrink: true }}
+                                    placeholder={"Kydele, Chosen of Kruphix"}
+                                    fullWidth
+                                    variant="standard"
+                                /> : null}
+                            </Grid>
+                        </Grid>
                     </Grid>
                 </Grid>
 
-                <Grid item> </Grid>
+                <Grid item container style={{ "height": "20px" }}> </Grid>
 
                 {/* Step 2: Paste a decklist */}
-                <Grid container>
+                <Grid container spacing={1}>
                     {/* Icon and Title */}
-                    <Grid container direction="row" alignItems="start" wrap='nowrap'>
-                        <Icon className={"Step-container"}>
-                            <img className={"Step"} src={step2} alt="step-2" />
-                        </Icon>
-                        <Typography variant="h6"
-                            className={classes.heading}
-                        >
-                            Paste a decklist
-                        </Typography>
+                    <Grid container item direction="row" alignItems="start" xs={12}>
+                        <Grid container item xs={1}>
+                            <Icon className={"Step-container"}>
+                                <img className={"Step"} src={step2} alt="step-2" />
+                            </Icon>
+                        </Grid>
+                        <Grid container item xs={11}>
+                            <Typography variant="h6">
+                                Paste a decklist <br />
+                            </Typography>
+                            <Typography variant="caption" flexWrap="wrap">
+                                You can also directly paste a URL to a deck from:
+                                &nbsp;
+                                <Tooltip title="Format: https://mtggoldfish.com/deck/1234567" arrow>
+                                    <Typography variant="caption">
+                                        <u>mtggoldfish</u>,
+                                    </Typography>
+                                </Tooltip>
+                                &nbsp;
+                                <Tooltip title="Format: https://deckstats.net/decks/12345/1234567-my-awesome-deck/en" arrow>
+                                    <Typography variant="caption">
+                                        <u>deckstats</u>,
+                                    </Typography>
+                                </Tooltip>
+                                &nbsp;
+                                <Tooltip title="Format: http://tappedout.net/mtg-decks/my-awesome-deck/" arrow>
+                                    <Typography variant="caption">
+                                        <u>tappedout</u>,
+                                    </Typography>
+                                </Tooltip>
+                                &nbsp;
+                                <Tooltip title="Format: https://manastack.com/builder/123456 (downloads mainboard only)." arrow>
+                                    <Typography variant="caption" className='subHeader'>
+                                        <u>manastack</u>.
+                                    </Typography>
+                                </Tooltip>
+                            </Typography>
+                        </Grid>
                     </Grid>
 
                     {/* Decklist input */}
-                    <Grid item xs={11} style={{ paddingLeft: "30px" }}>
-                        {/* TODO the wrap does not work */}
-                        <Typography variant="caption" flexWrap="wrap">
-                            You can also directly paste a URL to a deck from:
-                            &nbsp;
-                            <Tooltip title="Format: https://mtggoldfish.com/deck/1234567" arrow>
-                                <Typography variant="caption">
-                                    <u>mtggoldfish</u>,
-                                </Typography>
-                            </Tooltip>
-                            &nbsp;
-                            <Tooltip title="Format: https://deckstats.net/decks/12345/1234567-my-awesome-deck/en" arrow>
-                                <Typography variant="caption">
-                                    <u>deckstats</u>,
-                                </Typography>
-                            </Tooltip>
-                            &nbsp;
-                            <Tooltip title="Format: http://tappedout.net/mtg-decks/my-awesome-deck/" arrow>
-                                <Typography variant="caption">
-                                    <u>tappedout</u>,
-                                </Typography>
-                            </Tooltip>
-                            &nbsp;
-                            <Tooltip title="Format: https://manastack.com/builder/123456 (downloads mainboard only)." arrow>
-                                <Typography variant="caption" className='subHeader'>
-                                    <u>manastack</u>.
-                                </Typography>
-                            </Tooltip>
-                        </Typography>
-
-                        <Grid item container>
-                            <Grid container item xs={12}>
+                    <Grid xs={12} item container direction="row">
+                        <Grid item container xs={1}> </Grid>
+                        <Grid item container xs={11} flexDirection="row">
+                            <Grid item container xs={9}>
                                 <TextField
                                     id="decklist"
                                     name="decklist"
@@ -163,7 +174,9 @@ export default function InfoForm() {
                                     variant={"outlined"}
                                 />
                             </Grid>
-                            <Grid container item xs={12} style={{ paddingLeft: "5px" }}>
+
+                            {/* Switches Sideboard and card back*/}
+                            <Grid container item>
                                 <FormGroup row>
                                     <FormControlLabel
                                         control={
@@ -189,133 +202,136 @@ export default function InfoForm() {
                                     />
                                 </FormGroup>
                             </Grid>
+
+                            <Grid item container style={{ "height": "20px" }}> </Grid>
+
+                            {/* Sideboard */}
+                            {sideboardEnabled ? <Grid container item xs={9}>
+                                <TextField
+                                    id="sideboard"
+                                    name="sideboard"
+                                    label="Sideboard"
+                                    value={form.sideboard}
+                                    onChange={(e) => {
+                                        setForm({ ...form, "sideboard": e.target.value })
+                                    }}
+                                    InputLabelProps={{ shrink: true }}
+                                    placeholder={
+                                        "1 Stolen by the Fae\n" +
+                                        "1 Prismite\n" +
+                                        "6 Plains\n" +
+                                        "...."}
+                                    fullWidth
+                                    multiline
+                                    rows={4}
+                                    variant={"outlined"}
+                                />
+                            </Grid> : null}
+
+                            <Grid item container style={{ "height": "20px" }}> </Grid>
+
+                            {/* Custom card back */}
+                            {customCardBackChecked ?
+                                <Grid item container xs={11} direction="row" justifyContent="space-between">
+                                    <TextField
+                                        id="cardback"
+                                        name="cardback"
+                                        label="Custom Card Back"
+                                        value={form.cardback}
+                                        onChange={(e) => {
+                                            setForm({ ...form, "cardback": e.target.value })
+                                            // test if correct url, if so, set download on OK
+                                            if (!isValidHttpUrl(e.target.value)) {
+                                                setDisabled(true);
+                                            } else {
+                                                setDisabled(false);
+                                            }
+                                        }}
+                                        InputLabelProps={{ shrink: true }}
+                                        placeholder={DEFAULT_CARD_BACK_IMAGE_URL}
+                                        helperText="Paste a URL to a card image with a ratio of 488 × 680"
+                                        fullWidth
+                                        variant="standard"
+                                        style={{ paddingRight: "10px", width: "auto" }}
+                                    />
+                                    <Card className={"CardBack"}>
+                                        <CardMedia image={form.cardback} className={"CardBack"}>
+                                        </CardMedia>
+                                    </Card>
+                                </Grid>
+                                : null}
                         </Grid>
                     </Grid>
                 </Grid>
 
-                {/* Sideboard */}
-                {sideboardEnabled ? <Grid container item xs={12} style={{ paddingLeft: "30px" }}>
-                    <TextField
-                        id="sideboard"
-                        name="sideboard"
-                        label="Sideboard"
-                        value={form.sideboard}
-                        onChange={(e) => {
-                            setForm({ ...form, "sideboard": e.target.value })
-                        }}
-                        InputLabelProps={{ shrink: true }}
-                        placeholder={
-                            "1 Stolen by the Fae\n" +
-                            "1 Prismite\n" +
-                            "6 Plains\n" +
-                            "...."}
-                        fullWidth
-                        multiline
-                        rows={4}
-                        variant={"outlined"}
-                    />
-                </Grid> : null}
-
-                <Grid item> </Grid>
-
-                {/* Custom card back */}
-                <Grid item container direction="row" style={{ paddingLeft: "30px" }}>
-                        {customCardBackChecked ?
-                            <Grid item container xs={11} direction="row" justifyContent="space-between">
-                                <TextField
-                                    id="cardback"
-                                    name="cardback"
-                                    label="Custom Card Back"
-                                    value={form.cardback}
-                                    onChange={(e) => {
-                                        setForm({ ...form, "cardback": e.target.value })
-                                        // test if correct url, if so, set download on OK
-                                        if (!isValidHttpUrl(e.target.value)) {
-                                            setDisabled(true);
-                                        } else {
-                                            setDisabled(false);
-                                        }
-                                    }}
-                                    InputLabelProps={{ shrink: true }}
-                                    placeholder={DEFAULT_CARD_BACK_IMAGE_URL}
-                                    helperText="Paste a URL to a card image with a ratio of 488 × 680"
-                                    fullWidth
-                                    variant="standard"
-                                    style={{ paddingRight: "10px", width: "auto" }}
-                                />
-                                <Card className={"CardBack"}>
-                                    <CardMedia image={form.cardback} className={"CardBack"}>
-                                    </CardMedia>
-                                </Card>
-                            </Grid>
-                            : null}
-                </Grid>
-
-                <Grid item > </Grid>
+                <Grid item container style={{ "height": "20px" }}> </Grid>
 
                 {/* Step 3: Download and install instructions */}
-                <Grid container>
+                <Grid container spacing={1}>
                     {/* Icon and Button */}
-                    <Grid container direction="row" alignItems="start" wrap='nowrap'>
+                    <Grid container item xs={1}>
                         <Icon className={"Step-container"}>
                             <img className={"Step"} src={step3} alt="step-3" />
                         </Icon>
-                        <Grid item xs={11}>
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                onClick={async function () {
-                                    setDisabled(true);
-                                    let e = await download(form);
-                                    if (e !== "") {
-                                        setErrors(e);
-                                    }
-                                    setDisabled(false);
-                                }}
-                                aria-label="download tabletop JSON"
-                                disabled={disabled || (form.commander === "" && form.decklist === "")}
-                            >
-                                Download Tabletop Simulator file
-                            </Button>
-                            {/* <Grid item xs={12}> */}
-                            {/* <Typography */}
-                            {/* variant={"caption"}> */}
-                            {/* Downloading may take a couple of seconds. */}
-                            {/* </Typography> */}
-                            {/* </Grid> */}
-                            {/* <br /> */}
-                        </Grid>
                     </Grid>
-                    
+                    <Grid container item xs={11}>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={async function () {
+                                setDisabled(true);
+                                let e = await download(form);
+                                if (e !== "") {
+                                    setErrors(e);
+                                }
+                                setDisabled(false);
+                            }}
+                            aria-label="download tabletop JSON"
+                            disabled={disabled || (form.commander === "" && form.decklist === "")}
+                        >
+                            Download Tabletop Simulator file
+                        </Button>
+                        {/* <Grid item xs={12}> */}
+                        {/* <Typography */}
+                        {/* variant={"caption"}> */}
+                        {/* Downloading may take a couple of seconds. */}
+                        {/* </Typography> */}
+                        {/* </Grid> */}
+                        {/* <br /> */}
+                    </Grid>
+
                     {/* Installation instructions */}
-                    <Grid item container direction="row" style={{ paddingLeft: "30px" }}>
-                            <Typography variant="caption"> 
+                    <Grid xs={12} item container direction="row">
+                        <Grid item container xs={1}> </Grid>
+                        <Grid item container xs={11} flexDirection="row">
+                            <Typography variant="caption">
                                 Save the output file in the Tabletop Simulator folder:
                             </Typography>
-                        <Grid item container direction="row" spacing={1}>
-                            <Grid item xs={1}>
-                                <Typography variant="caption">
+                            <Grid item container direction="row" spacing={1}>
+                                <Grid item xs={1}>
+                                    <Typography variant="caption">
+                                        <SvgIcon>
+                                            <LaptopWindowsIcon aria-label="windows" />
+                                        </SvgIcon>
+                                    </Typography>
+                                </Grid>
+                                <Grid item xs={11}>
+                                    <Typography variant="caption" className={"Wrap"}>
+                                        C:\Users\YOUR_NAME\Documents\My Games\Tabletop Simulator\Saves\Saved Objects\
+                                    </Typography>
+                                </Grid>
+                            </Grid>
+                            <Grid item container direction="row" spacing={1}>
+                                <Grid item xs={1}>
                                     <SvgIcon>
-                                        <LaptopWindowsIcon aria-label="windows"/>
+                                        <AppleIcon aria-label="mac" />
                                     </SvgIcon>
-                                </Typography>
-                            </Grid>
-                            <Grid item xs={11}>
-                                <Typography variant="caption" className={"Wrap"}>
-                                    C:\Users\YOUR_NAME\Documents\My Games\Tabletop Simulator\Saves\Saved Objects\
-                                </Typography>
-                            </Grid>
-                        </Grid>
-                        <Grid item container direction="row" spacing={1}>
-                            <Grid item xs={1}>
-                                <SvgIcon>
-                                    <AppleIcon aria-label="mac"/>
-                                </SvgIcon>
-                            </Grid>
-                            <Grid item xs={11}>
-                                <Typography variant="caption" className={"Wrap"}>
-                                    ~/Library/Tabletop Simulator/Saves/Saved Objects/
-                                </Typography>
+                                </Grid>
+                                <Grid item xs={11}>
+                                    <Typography variant="caption" className={"Wrap"}>
+                                        ~/Library/Tabletop Simulator/Saves/Saved Objects/
+                                    </Typography>
+                                </Grid>
                             </Grid>
                         </Grid>
                     </Grid>
