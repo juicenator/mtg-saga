@@ -15,11 +15,15 @@ body {
   pointer-events: none;
 }
 
+.Step-container {
+  height: 30px !important;
+  width: 30px !important;
+}
+
 .Step {
   object-fit: cover;
-  height: 6vmin;
-  min-height: 30px;
-  margin-top:-1vmin;
+  height: inherit;
+  width: inherit;
 }
 
 .Wrap {

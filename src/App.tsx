@@ -1,16 +1,10 @@
 import React from 'react';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import Button from '@material-ui/core/Button';
-import Link from '@material-ui/core/Link';
-import Typography from '@material-ui/core/Typography';
+import { CssBaseline, AppBar, Toolbar, Button, Link, Typography } from '@mui/material';
 import DeckInfo from './DeckInfo';
-import SealedInfo from './SealedInfo';
-import PreconInfo from './PreconInfo';
 import useStyles from './Styles';
 import { Router, RouteComponentProps } from "@reach/router";
 import './App.css';
+
 
 const RouterPage = (
   props: { pageComponent: JSX.Element } & RouteComponentProps
@@ -18,23 +12,25 @@ const RouterPage = (
 
 function Copyright() {
   return (
-      <Typography variant="caption" color="textSecondary" align="center">
-        {'Copyright © Anton Steenvoorden - '}
-        {new Date().getFullYear()}
-        {'. Made possible by '}
-        <Link color="inherit" href="https://scryfall.com/">
-          scryfall.com
-        </Link>
-      </Typography>
+    <Typography variant="caption" color="textSecondary" align="center">
+      {'Copyright © Anton Steenvoorden - '}
+      {new Date().getFullYear()}
+      {'. Made possible by '}
+      <Link color="inherit" href="https://scryfall.com/">
+        scryfall.com
+      </Link>
+    </Typography>
   );
 }
 
+
 function App() {
-  const classes = useStyles();
+  const { classes } = useStyles();
 
   return (
     <React.Fragment>
       <CssBaseline />
+
       <AppBar position="absolute" color="default" className={classes.appBar}>
         <Toolbar>
           <img src="./mtgsaga.png" className="App-logo" alt="MTG Saga Logo" />
@@ -44,31 +40,6 @@ function App() {
             </Typography>
           </Link>
           <span style={{ flex: 1 }}></span>
-          
-          {/* 
-          <Link href="/sealed" style={{ textDecoration: 'none' }} color="inherit">
-            <Button
-              type="submit"
-              name="sealed"
-              variant="contained"
-              aria-label="Generate a sealed pack"
-            >
-              Sealed
-              </Button>
-          </Link> */}
-
-          {/* 
-          <Link href="/precon" style={{ textDecoration: 'none', marginRight: ".5%" }} color="inherit">
-            <Button
-              type="submit"
-              name="sealed"
-              variant="contained"
-              color="primary"
-              aria-label="Modify and download preconstructed decks"
-            >
-              Precon Decks
-              </Button>
-          </Link> */}
 
           <form id="donate" action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
             <input type="hidden" name="cmd" value="_s-xclick" />
@@ -81,16 +52,13 @@ function App() {
               aria-label="donate to MTG Saga"
             >
               Donate
-                </Button>
+            </Button>
           </form>
         </Toolbar>
       </AppBar>
       <main className={classes.layout}>
         <Router>
           <RouterPage path="/" pageComponent={<DeckInfo />} />
-          <RouterPage path="/precon" pageComponent={<PreconInfo />} />
-          {/* <RouterPage path="/sealed" pageComponent={<SealedInfo />} /> */}
-
         </Router>
         <Copyright />
       </main>

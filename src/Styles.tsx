@@ -1,18 +1,18 @@
-import {makeStyles} from "@material-ui/core/styles";
+import { makeStyles } from 'tss-react/mui';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles()((theme) => ({
     appBar: {
         position: 'relative',
-        "display": 'flex',
-        "flex-direction": 'column',
-        "margin": 0,
-        "padding": 0,
+        display: 'flex',
+        flexDirection: 'column',
+        margin: 0,
+        padding: 0,
     },
     layout: {
         width: 'auto',
         marginLeft: theme.spacing(2),
         marginRight: theme.spacing(2),
-        [theme.breakpoints.up(610 + theme.spacing(2) * 2)]: {
+        [theme.breakpoints.up(610)]: {
             width: 610,
             marginLeft: 'auto',
             marginRight: 'auto',
@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
         marginTop: theme.spacing(3),
         marginBottom: theme.spacing(3),
         padding: theme.spacing(2),
-        [theme.breakpoints.up(610 + theme.spacing(3) * 2)]: {
+        [theme.breakpoints.up(610)]: {
             marginTop: theme.spacing(5),
             marginBottom: theme.spacing(5),
             padding: theme.spacing(3),
@@ -42,4 +42,5 @@ const useStyles = makeStyles((theme) => ({
         marginTop: theme.spacing(1),
     }
 }));
+// TODO jss-to-tss-react codemod: usages of this hook outside of this file will not be converted.
 export default useStyles;
