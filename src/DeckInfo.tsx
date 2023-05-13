@@ -345,8 +345,9 @@ export default function InfoForm() {
                     </Grid>
                 </Grid>
 
+                {/* Wicloz is hosting this now */}
                 {/* Please donate line */}
-                <Grid item xs={12}>
+                {/* <Grid item xs={12}>
                     <Typography
                         variant={"body2"}>
                         <form id="donate" action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
@@ -356,7 +357,7 @@ export default function InfoForm() {
                             ><b><u>donate</u></b></button> to help in covering the server costs.
                         </form>
                     </Typography>
-                </Grid>
+                </Grid> */}
 
 
                 {/*Error display*/}
