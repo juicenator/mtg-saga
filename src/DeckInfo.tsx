@@ -92,6 +92,7 @@ export default function InfoForm() {
                         </Grid>
                     </Grid>
 
+                    <Grid item> </Grid>
 
                     {/* Step 2: Paste a decklist */}
                     <Grid container>
@@ -205,8 +206,10 @@ export default function InfoForm() {
                         </Grid>
                     </Grid>
 
+                    <Grid item> </Grid>
+
                     {/* Step 2.5: Custom card back */}
-                    <Grid item container direction="row" spacing={1}>
+                    <Grid item container direction="row">
                         <Grid item xs={1}>
                         </Grid>
                         <Grid item container xs={11} direction="row">
@@ -239,6 +242,7 @@ export default function InfoForm() {
                                         placeholder={DEFAULT_CARD_BACK_IMAGE_URL}
                                         helperText="Paste a URL to a card image with a ratio of 488 × 680"
                                         fullWidth
+                                        variant="standard"
                                     />
                                     <Card className={"CardBack"}>
                                         <CardMedia image={form.cardback} className={"CardBack"}>
@@ -248,6 +252,8 @@ export default function InfoForm() {
                                 : null}
                         </Grid>
                     </Grid>
+
+                    <Grid item > </Grid>
 
                     {/* Step 3: Download and install instructions */}
                     <Grid container>
