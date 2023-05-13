@@ -1,5 +1,5 @@
-import Card from '../Card';
-import {CardType} from "../Tabletop";
+import Card from './Card';
+import {CardType} from "./Tabletop";
 
 it('can be constructed', () => {
     const card = new Card("Saltblast", 2, CardType.Default);

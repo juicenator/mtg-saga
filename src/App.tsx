@@ -1,14 +1,27 @@
 import React from 'react';
-import { CssBaseline, AppBar, Toolbar, Button, Link, Typography } from '@mui/material';
+
+// Pages
 import DeckInfo from './DeckInfo';
+import ErrorPage from './ErrorPage';
+
+// Styles and meterial
 import useStyles from './Styles';
-import { Router, RouteComponentProps } from "@reach/router";
 import './App.css';
+import { CssBaseline, AppBar, Toolbar, Button, Link, Typography } from '@mui/material';
+
+import {
+  createBrowserRouter,
+  RouterProvider,
+} from "react-router-dom";
 
 
-const RouterPage = (
-  props: { pageComponent: JSX.Element } & RouteComponentProps
-) => props.pageComponent;
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <DeckInfo />,
+    errorElement: <ErrorPage />,
+  },
+]);
 
 function Copyright() {
   return (
@@ -57,9 +70,7 @@ function App() {
         </Toolbar>
       </AppBar>
       <main className={classes.layout}>
-        <Router>
-          <RouterPage path="/" pageComponent={<DeckInfo />} />
-        </Router>
+          <RouterProvider router={router} />
         <Copyright />
       </main>
     </React.Fragment>
