@@ -8,7 +8,7 @@ export type DeckBox = {
     "Name": "DeckCustom",
     "ContainedObjects": TabletopObject[],
     "DeckIDs": number[],
-    "CustomDeck": { [key: string]: TabletopCard },
+    "CustomDeck": { [key: number]: TabletopCard },
     "Transform": {}
 }
 
@@ -97,7 +97,7 @@ function getDeckBox(deckType: DeckType): DeckBox {
 export function generateTabletopOutput(cards: Card[], hasAdditional: boolean, hasCommander: boolean, hasSideboard: boolean): TabletopOutput {
     let deckTypes = [DeckType.Default];
     // Prepare deckboxes
-    let deckBoxes: { [key: string]: DeckBox; } = {};
+    let deckBoxes: { [key in DeckType]?: DeckBox; } = {};
     deckBoxes[DeckType.Default] = getDeckBox(DeckType.Default);
 
     if (hasAdditional) {
@@ -116,15 +116,23 @@ export function generateTabletopOutput(cards: Card[], hasAdditional: boolean, ha
     }
 
     console.log("Building JSON");
-    let cardIds: { [key: string]: number; } = {};
+    let cardIds: { [key in DeckType]: number; } = {
+        [DeckType.Default]: 1,
+        [DeckType.Additional]: 1,
+        [DeckType.Commander]: 1,
+        [DeckType.Sideboard]: 1
+    };
     let cardOffsets = 0;
 
     deckTypes.forEach((deckType) => {
-        console.log("Handle deck type: " + deckType);
-        // initialise card id
-        if (!(deckType in cardIds)) {
-            cardIds[deckType] = 1;
+        const deckboxes = deckBoxes[deckType];
+        // Typescript guard. Bit weird but this is needed.
+        if(!deckboxes){
+            return;
         }
+
+        console.log("Handle deck type: " + deckType);
+
         // select cards from one of the decktypes
         cards.filter((c) => {
             return (c.cardType.toString() === deckType);
@@ -135,13 +143,13 @@ export function generateTabletopOutput(cards: Card[], hasAdditional: boolean, ha
                 card.setId(tmpCardId);
 
                 // register card ID
-                deckBoxes[deckType].DeckIDs.push(tmpCardId);
+                deckboxes.DeckIDs.push(tmpCardId);
 
                 // register card object
-                deckBoxes[deckType].ContainedObjects.push(card.getCardObject())
+                deckboxes.ContainedObjects.push(card.getCardObject());
 
                 // register card visual object
-                deckBoxes[deckType].CustomDeck[String(cardIds[deckType])] = card.getTabletopCard();
+                deckboxes.CustomDeck[cardIds[deckType]] = card.getTabletopCard();
                 cardIds[deckType] += 1;
             }
         });
@@ -151,18 +159,18 @@ export function generateTabletopOutput(cards: Card[], hasAdditional: boolean, ha
             let tmpCardId = cardIds[deckType] * 100 + cardOffsets;
             let tmpCard = new Card("Padding", 1, CardType.Default);
             tmpCard.setId(tmpCardId);
-            deckBoxes[deckType].DeckIDs.unshift(tmpCardId);
-            deckBoxes[deckType].ContainedObjects.unshift(tmpCard.getCardObject());
-            deckBoxes[deckType].CustomDeck[String(cardIds[deckType])] = tmpCard.getTabletopCard();
+            deckboxes.DeckIDs.unshift(tmpCardId);
+            deckboxes.ContainedObjects.unshift(tmpCard.getCardObject());
+            deckboxes.CustomDeck[cardIds[deckType]] = tmpCard.getTabletopCard();
         }
         // Offset for different stack ids
         cardOffsets += 1;
     });
     
     let objectStates = [deckBoxes[DeckType.Default]];
-    if (hasAdditional) objectStates.push(deckBoxes[DeckType.Additional]);
-    if (hasCommander) objectStates.push(deckBoxes[DeckType.Commander]);
-    if (hasSideboard) objectStates.push(deckBoxes[DeckType.Sideboard]);
+    if (hasAdditional && deckBoxes[DeckType.Additional]) objectStates.push(deckBoxes[DeckType.Additional]);
+    if (hasCommander && deckBoxes[DeckType.Commander]) objectStates.push(deckBoxes[DeckType.Commander]);
+    if (hasSideboard && deckBoxes[DeckType.Sideboard]) objectStates.push(deckBoxes[DeckType.Sideboard]);
 
     return {
         "ObjectStates": objectStates
