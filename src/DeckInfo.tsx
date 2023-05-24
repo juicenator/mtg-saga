@@ -22,7 +22,9 @@ import { DEFAULT_CARD_BACK_IMAGE_URL } from "./Card";
 export default function InfoForm() {
     const { classes } = useStyles();
     const [form, setForm] = useState({ "commander": "", "partner": "", "decklist": "", "sideboard": "", "cardback": "" });
+
     const [disabled, setDisabled] = useState(false);
+    const [customCardBackDisabled, setCustomCardBackDisabled] = useState(false);
     const [sideboardEnabled, setSideboardEnabled] = useState(false);
     const [errors, setErrors] = useState("");
     const [checked, setChecked] = useState(false);
@@ -194,11 +196,19 @@ export default function InfoForm() {
                                 </FormGroup>
                                 <FormGroup row>
                                     <FormControlLabel
-                                        control={<Switch checked={customCardBackChecked} onChange={(e) => {
-                                            setCustomCardBackChecked(e.target.checked);
-                                            setForm({ ...form, "cardback": DEFAULT_CARD_BACK_IMAGE_URL });
-                                        }} name="cardback-switch" size="small" />}
-                                        label="Custom Card Back"
+                                        control={
+                                            <Switch checked={customCardBackChecked} 
+                                                onChange={(e) => {
+                                                    setCustomCardBackChecked(e.target.checked);
+                                                    if(e.target.checked === false) {
+                                                        setCustomCardBackDisabled(false);
+                                                    }
+                                                    setForm({ ...form, "cardback": DEFAULT_CARD_BACK_IMAGE_URL });
+                                                }} 
+                                                name="cardback-switch" 
+                                                size="small"/>
+                                        }
+                                    label="Custom Card Back"
                                     />
                                 </FormGroup>
                             </Grid>
@@ -249,9 +259,9 @@ export default function InfoForm() {
                                                 setForm({ ...form, "cardback": e.target.value })
                                                 // test if correct url, if so, set download on OK
                                                 if (!isValidHttpUrl(e.target.value)) {
-                                                    setDisabled(true);
+                                                    setCustomCardBackDisabled(true);
                                                 } else {
-                                                    setDisabled(false);
+                                                    setCustomCardBackDisabled(false);
                                                 }
                                             }}
                                             InputLabelProps={{ shrink: true }}
@@ -295,7 +305,7 @@ export default function InfoForm() {
                                 setDisabled(false);
                             }}
                             aria-label="download tabletop JSON"
-                            disabled={disabled || (form.commander === "" && form.decklist === "")}
+                            disabled={ disabled || customCardBackDisabled || (form.commander === "" && form.decklist === "") }
                         >
                             Download Tabletop Simulator file
                         </Button>
