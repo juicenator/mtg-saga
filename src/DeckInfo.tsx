@@ -202,6 +202,7 @@ export default function InfoForm() {
                                                     setCustomCardBackChecked(e.target.checked);
                                                     if (e.target.checked === false) {
                                                         setCustomCardBackDisabled(false);
+                                                        setForm({ ...form, "cardback": "" });
                                                     } else {
                                                         setForm({ ...form, "cardback": DEFAULT_CARD_BACK_IMAGE_URL });
                                                     }
