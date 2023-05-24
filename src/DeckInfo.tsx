@@ -197,18 +197,20 @@ export default function InfoForm() {
                                 <FormGroup row>
                                     <FormControlLabel
                                         control={
-                                            <Switch checked={customCardBackChecked} 
+                                            <Switch checked={customCardBackChecked}
                                                 onChange={(e) => {
                                                     setCustomCardBackChecked(e.target.checked);
-                                                    if(e.target.checked === false) {
+                                                    if (e.target.checked === false) {
                                                         setCustomCardBackDisabled(false);
+                                                        setForm({ ...form, "cardback": "" });
+                                                    } else {
+                                                        setForm({ ...form, "cardback": DEFAULT_CARD_BACK_IMAGE_URL });
                                                     }
-                                                    setForm({ ...form, "cardback": DEFAULT_CARD_BACK_IMAGE_URL });
-                                                }} 
-                                                name="cardback-switch" 
-                                                size="small"/>
+                                                }}
+                                                name="cardback-switch"
+                                                size="small" />
                                         }
-                                    label="Custom Card Back"
+                                        label="Custom Card Back"
                                     />
                                 </FormGroup>
                             </Grid>
