@@ -36,16 +36,6 @@ export function getName(line: string) {
     return line.trim().toLowerCase().replace(punctRE, '');
 }
 
-export function compareToCommanders(commanders: string[], cardName: string) {
-    let isEqual = false;
-    for (let commander of commanders) {
-        if (commander === cardName) {
-            isEqual = true;
-            break;
-        }
-    };
-    return isEqual;
-}
 export function isValidHttpUrl(str: string): boolean {
     var res = str.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/g);
     if(res == null)
