@@ -20,9 +20,6 @@ async function download(form: any): Promise<string> {
     if (!isValidHttpUrl(cardBack)) {
         cardBack = DEFAULT_CARD_BACK_IMAGE_URL;
     }
-
-    // CustomCardBack
-    console.log("Using custom cardback: ", cardBack);
     
     // multiline forms
     let decklistForm: string = form.decklist;
@@ -45,7 +42,6 @@ async function download(form: any): Promise<string> {
         .filter((c: string) => { return c.trim() !== "" })
         .map((c: string) => { return getName(c) });
     
-    console.log("commanders: "+ commanders);
     let hasSideboard = sideboardForm !== "";
     
     // start parsing
@@ -55,8 +51,6 @@ async function download(form: any): Promise<string> {
     // Handle URLs
     if (isValidHttpUrl(decklist[0])) {
         decklist = await getDeckFromURL(decklist[0]);
-        console.log("Decklist from site:")
-        console.log(decklist);
     }
 
 
@@ -71,7 +65,6 @@ async function download(form: any): Promise<string> {
         if (hasCommander) {
             let isCommander = compareToCommanders(commanders, getName(tmpCard.name));
             if (isCommander) {
-                console.log("Found commander in decklist as well");
                 tmpCard.setCardType(CardType.Commander);
                 commanderIndices.push(index);
             }

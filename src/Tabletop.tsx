@@ -115,7 +115,6 @@ export function generateTabletopOutput(cards: Card[], hasAdditional: boolean, ha
         deckTypes.push(DeckType.Sideboard);
     }
 
-    console.log("Building JSON");
     let cardIds: { [key in DeckType]: number; } = {
         [DeckType.Default]: 1,
         [DeckType.Additional]: 1,
@@ -130,8 +129,6 @@ export function generateTabletopOutput(cards: Card[], hasAdditional: boolean, ha
         if(!deckboxes){
             return;
         }
-
-        console.log("Handle deck type: " + deckType);
 
         // select cards from one of the decktypes
         cards.filter((c) => {

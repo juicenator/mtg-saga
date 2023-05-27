@@ -126,7 +126,7 @@ export default class Card {
             const json = await res.json();
             this.parseResults(json);
         } catch (err) {
-            console.log("ER1: Failed to get: " + this.name);
+            console.error("ER1: Failed to get: " + this.name);
             this.failed = true;
         }
     }
