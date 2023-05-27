@@ -1,13 +1,14 @@
 import Card, {DEFAULT_CARD_BACK_IMAGE_URL} from './Card';
 import { CardType, generateTabletopOutput } from './Tabletop';
 import { getDeckFromURL } from './DeckURL';
-import { getName, getNumInstances, compareToCommanders, downloadPrompt } from './Utils';
+import { getName, getNumInstances, downloadPrompt } from './Utils';
 import { isValidHttpUrl } from './Utils';
 
 const DEFAULT_RESPONSE = "";
 
 
 // Perhaps build in a delay here to prevent Scryfall from overloading.
+// Note: Since you already start the promises when you make them and not await them this is not the place to do it...
 async function performQueries(promises: any[]) {
     return Promise.all(promises);
 }
@@ -20,9 +21,6 @@ async function download(form: any): Promise<string> {
     if (!isValidHttpUrl(cardBack)) {
         cardBack = DEFAULT_CARD_BACK_IMAGE_URL;
     }
-
-    // CustomCardBack
-    console.log("Using custom cardback: ", cardBack);
     
     // multiline forms
     let decklistForm: string = form.decklist;
@@ -37,15 +35,15 @@ async function download(form: any): Promise<string> {
         return DEFAULT_RESPONSE;
     }
 
-    let hasCommander = commander !== "";
+    const hasCommander = commander !== "";
+    const commanders = [commander]
     if (partner !== "") {
-        commander += "\n" + partner;
+        commanders.push(partner)
     }
-    let commanders = commander.split("\n")
+    const commanderToBeHandled = commanders
         .filter((c: string) => { return c.trim() !== "" })
         .map((c: string) => { return getName(c) });
     
-    console.log("commanders: "+ commanders);
     let hasSideboard = sideboardForm !== "";
     
     // start parsing
@@ -55,10 +53,7 @@ async function download(form: any): Promise<string> {
     // Handle URLs
     if (isValidHttpUrl(decklist[0])) {
         decklist = await getDeckFromURL(decklist[0]);
-        console.log("Decklist from site:")
-        console.log(decklist);
     }
-
 
     // Build decklist with queries
     decklist.forEach((line: string, index: number) => {
@@ -68,10 +63,10 @@ async function download(form: any): Promise<string> {
         let tmpCard = Card.fromLine(line.trim());
         tmpCard.setBackUrl(cardBack);
 
-        if (hasCommander) {
-            let isCommander = compareToCommanders(commanders, getName(tmpCard.name));
+        if (commanderToBeHandled.length > 0) {
+            let isCommander = commanderToBeHandled.includes(getName(tmpCard.name));
             if (isCommander) {
-                console.log("Found commander in decklist as well");
+                commanderToBeHandled.splice(commanderToBeHandled.indexOf(getName(tmpCard.name)), 1);
                 tmpCard.setCardType(CardType.Commander);
                 commanderIndices.push(index);
             }
@@ -81,8 +76,8 @@ async function download(form: any): Promise<string> {
     });
 
     // Add commander if not present in main deck
-    if (hasCommander && commanderIndices.length === 0) {
-        commanders.forEach((line) => {
+    if (commanderToBeHandled.length > 0) {
+        commanderToBeHandled.forEach((line) => {
             if (line === "" || line.startsWith("//")) {
                 return;
             }
