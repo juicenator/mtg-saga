@@ -1,4 +1,4 @@
-import Card, {DEFAULT_CARD_BACK_IMAGE_URL} from './Card';
+import Card, { DEFAULT_CARD_BACK_IMAGE_URL } from './Card';
 import { CardType, generateTabletopOutput } from './Tabletop';
 import { getDeckFromURL } from './DeckURL';
 import { getName, getNumInstances, downloadPrompt } from './Utils';
@@ -17,11 +17,11 @@ async function download(form: any): Promise<string> {
     // single forms
     let commander: string = form.commander;
     let partner: string = form.partner;
-    let cardBack: string = form.cardback.trim(); 
+    let cardBack: string = form.cardback.trim();
     if (!isValidHttpUrl(cardBack)) {
         cardBack = DEFAULT_CARD_BACK_IMAGE_URL;
     }
-    
+
     // multiline forms
     let decklistForm: string = form.decklist;
     let sideboardForm: string = form.sideboard;
@@ -43,9 +43,9 @@ async function download(form: any): Promise<string> {
     const commanderToBeHandled = commanders
         .filter((c: string) => { return c.trim() !== "" })
         .map((c: string) => { return getName(c) });
-    
+
     let hasSideboard = sideboardForm !== "";
-    
+
     // start parsing
     let decklist: string[] = decklistForm.split("\n");
     let sideboard: string[] = sideboardForm.split("\n");
@@ -71,6 +71,7 @@ async function download(form: any): Promise<string> {
                 commanderIndices.push(index);
             }
         }
+
         cards.push(tmpCard);
         promises.push(tmpCard.getCardPromise());
     });
@@ -174,7 +175,7 @@ async function download(form: any): Promise<string> {
     } else {
         fileName = cards[0].name + ".json";
     }
-    
+
     downloadPrompt(fileName, tabletopOutput);
     console.log(tabletopOutput);
     return DEFAULT_RESPONSE;
