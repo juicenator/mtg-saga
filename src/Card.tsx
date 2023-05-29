@@ -200,7 +200,7 @@ export default class Card {
 
     getScryfallQueryUrl(): URL {
         if (this.collectorNumber && this.expansionCode) {
-            return new URL('https://api.scryfall.com/cards/'+this.expansionCode.toLowerCase()+'/'+this.collectorNumber);
+            return new URL('https://api.scryfall.com/cards/' + this.expansionCode.toLowerCase() + '/' + this.collectorNumber);
         }
 
         const url = new URL('https://api.scryfall.com/cards/named');
