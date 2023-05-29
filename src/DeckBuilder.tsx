@@ -94,14 +94,13 @@ async function download(form: any): Promise<string> {
 
     // Parse sideboard
     sideboard.forEach((line: string, index: number) => {
-        if (line === "" || line.startsWith("//")) {
+        if (line === "" || line.startsWith("//") || line.startsWith("#")) {
             return;
         }
-        line = line.trim();
-        let numInstances = getNumInstances(line);
-        let name = getName(line);
-        let tmpCard = new Card(name, numInstances, CardType.Sideboard);
+        let tmpCard = Card.fromLine(line.split("#")[0].trim());
         tmpCard.setBackUrl(cardBack);
+        tmpCard.setCardType(CardType.Sideboard);
+
         cards.push(tmpCard);
         promises.push(tmpCard.getCardPromise());
     });
