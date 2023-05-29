@@ -17,17 +17,6 @@ export function downloadPrompt(fileName: string, output: TabletopOutput) {
     document.body.removeChild(a);
 }
 
-const punctRE = /[\\'!"#$%&()*+,\-.:;<=>?@[\]^_`{|}~]/g;
-
-export function getName(line: string) {
-    // Starts with number
-    if (line.match(/^\d/)) {
-        let separated = line.split(" ");
-        return separated.slice(1).join(" ").trim().toLowerCase().replace(punctRE, '');
-    }
-    return line.trim().toLowerCase().replace(punctRE, '');
-}
-
 export function isValidHttpUrl(str: string): boolean {
     var res = str.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/g);
     if (res == null)
