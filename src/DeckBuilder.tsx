@@ -26,6 +26,14 @@ async function download(form: any): Promise<string> {
     let decklistForm: string = form.decklist;
     let sideboardForm: string = form.sideboard;
 
+    // parsing helpers
+    function isLineEmpty(line: string) {
+        return line === "" || line.startsWith("//") || line.startsWith("#");
+    }
+    function cleanLine(line: string) {
+        return line.split("#")[0].trim();
+    }
+
     // keep track of cards and commanders
     let commanderIndices: number[] = [];
     let promises: any[] = [];
@@ -57,10 +65,8 @@ async function download(form: any): Promise<string> {
 
     // Build decklist with queries
     decklist.forEach((line: string, index: number) => {
-        if (line === "" || line.startsWith("//") || line.startsWith("#")) {
-            return;
-        }
-        let tmpCard = Card.fromLine(line.split("#")[0].trim());
+        if (isLineEmpty(line)) return;
+        let tmpCard = Card.fromLine(cleanLine(line));
         tmpCard.setBackUrl(cardBack);
 
         if (commanderToBeHandled.length > 0) {
@@ -94,10 +100,8 @@ async function download(form: any): Promise<string> {
 
     // Parse sideboard
     sideboard.forEach((line: string, index: number) => {
-        if (line === "" || line.startsWith("//") || line.startsWith("#")) {
-            return;
-        }
-        let tmpCard = Card.fromLine(line.split("#")[0].trim());
+        if (isLineEmpty(line)) return;
+        let tmpCard = Card.fromLine(cleanLine(line));
         tmpCard.setBackUrl(cardBack);
         tmpCard.setCardType(CardType.Sideboard);
 
