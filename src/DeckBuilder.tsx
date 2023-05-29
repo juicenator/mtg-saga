@@ -80,11 +80,12 @@ async function download(form: any): Promise<string> {
         });
 
         // process special commander flags
-        COMMANDER_INDICATORS.forEach((indicator) => {
+        for (const indicator of COMMANDER_INDICATORS) {
             if (line.includes(indicator)) {
                 isCommander = true;
+                break;
             }
-        });
+        }
 
         cards.push(tmpCard);
         promises.push(tmpCard.getCardPromise());
