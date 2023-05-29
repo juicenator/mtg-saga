@@ -38,6 +38,7 @@ async function download(form: any): Promise<string> {
     let commanderIndices: number[] = [];
     let promises: any[] = [];
     let cards: Card[] = [];
+    let commanders: Card[] = [];
 
     // final checks
     if (commander === "" && decklistForm === "") {
@@ -55,7 +56,6 @@ async function download(form: any): Promise<string> {
     }
 
     // Process but do not commit commanders
-    let commanders: Card[] = [];
     [commander, partner].forEach((line: string, index: number) => {
         if (isLineEmpty(line)) return;
         let tmpCard = Card.fromLine(cleanLine(line));
@@ -63,33 +63,42 @@ async function download(form: any): Promise<string> {
         tmpCard.setCardType(CardType.Commander);
         commanders.push(tmpCard);
     });
-    let hasCommander = commanders.length > 0;
 
     // Build decklist with queries
     decklist.forEach((line: string, index: number) => {
         if (isLineEmpty(line)) return;
         let tmpCard = Card.fromLine(cleanLine(line));
         tmpCard.setBackUrl(cardBack);
+        let isCommander = false;
 
         // replace processed commanders when relevant
         commanders = commanders.filter((commander: Card) => {
             if (commander.name !== tmpCard.name) {
                 return true;
+            } else {
+                isCommander = true;
+                return false;
             }
-            tmpCard.setCardType(CardType.Commander);
-            commanderIndices.push(index);
-            return false;
         });
+
+        // process special commander flag
+        if (line.includes("!Commander")) {
+            isCommander = true;
+        }
 
         cards.push(tmpCard);
         promises.push(tmpCard.getCardPromise());
+        if (isCommander) {
+            tmpCard.setCardType(CardType.Commander);
+            commanderIndices.push(index);
+        }
     });
 
     // Commit remaining commanders
     commanders.forEach((commander: Card) => {
-        commanderIndices.push(cards.length);
         cards.push(commander);
         promises.push(commander.getCardPromise());
+        commanderIndices.push(cards.length);
     });
 
     // Parse sideboard
@@ -164,6 +173,7 @@ async function download(form: any): Promise<string> {
     }
 
     // Build JSON structure
+    let hasCommander = commanderIndices.length > 0;
     let hasAdditional = Object.keys(tokens).length > 0;
     let tabletopOutput = generateTabletopOutput(cards, hasAdditional, hasCommander, hasSideboard);
     let fileName = "";
