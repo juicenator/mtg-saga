@@ -1,7 +1,7 @@
 import Card, { DEFAULT_CARD_BACK_IMAGE_URL } from './Card';
 import { CardType, generateTabletopOutput } from './Tabletop';
 import { getDeckFromURL } from './DeckURL';
-import { getName, getNumInstances, downloadPrompt } from './Utils';
+import { getName, downloadPrompt } from './Utils';
 import { isValidHttpUrl } from './Utils';
 
 const DEFAULT_RESPONSE = "";

@@ -19,14 +19,6 @@ export function downloadPrompt(fileName: string, output: TabletopOutput) {
 
 const punctRE = /[\\'!"#$%&()*+,\-.:;<=>?@[\]^_`{|}~]/g;
 
-export function getNumInstances(line: string) {
-    let numInstances = Number(line.split(" ")[0])
-    if (isNaN(numInstances)) {
-        return 1;
-    }
-    return numInstances;
-}
-
 export function getName(line: string) {
     // Starts with number
     if (line.match(/^\d/)) {
@@ -38,7 +30,7 @@ export function getName(line: string) {
 
 export function isValidHttpUrl(str: string): boolean {
     var res = str.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/g);
-    if(res == null)
+    if (res == null)
         return false;
     else
         return true;
