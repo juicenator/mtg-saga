@@ -36,7 +36,7 @@ async function download(form: any): Promise<string> {
     let commanderIndices: number[] = [];
     let promises: any[] = [];
     let cards: Card[] = [];
-    let commanders: Card[] = [];
+    let commandersFromForm: Card[] = [];
 
     // final checks
     if (commander === "" && decklistForm === "") {
@@ -59,7 +59,7 @@ async function download(form: any): Promise<string> {
         let tmpCard = Card.fromLine(cleanLine(line));
         tmpCard.setBackUrl(cardBack);
         tmpCard.setCardType(CardType.Commander);
-        commanders.push(tmpCard);
+        commandersFromForm.push(tmpCard);
     });
 
     // Build decklist with queries
@@ -70,7 +70,7 @@ async function download(form: any): Promise<string> {
         let isCommander = false;
 
         // replace processed commanders when relevant
-        commanders = commanders.filter((commander: Card) => {
+        commandersFromForm = commandersFromForm.filter((commander: Card) => {
             if (commander.name !== tmpCard.name) {
                 return true;
             } else {
@@ -96,7 +96,7 @@ async function download(form: any): Promise<string> {
     });
 
     // Commit remaining commanders
-    commanders.forEach((commander: Card) => {
+    commandersFromForm.forEach((commander: Card) => {
         cards.push(commander);
         promises.push(commander.getCardPromise());
         commanderIndices.push(cards.length);
