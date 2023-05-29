@@ -6,7 +6,7 @@ import { Card } from '@mui/material';
 import imageNotFound from './images/image-not-found.png' // relative path to image
 
 import { isValidHttpUrl } from './Utils';
-import { DEFAULT_CARD_BACK_IMAGE_URL } from './Card';
+import { MTGSAGA_BACK_IMAGE_URL, CLASSIC_BACK_IMAGE_URL } from './Card';
 import { FormType, SetFormType } from './DeckInfo';
 
 type ImportType = {
@@ -21,11 +21,11 @@ export default function CardBackSelection({ form, setForm, setCustomCardBackDisa
 
     const preselectImages = [{
         "key": 1,
-        "url": DEFAULT_CARD_BACK_IMAGE_URL,
+        "url": MTGSAGA_BACK_IMAGE_URL,
         "alt": "dark mode magic the gathering card back"
     }, {
         "key": 2,
-        "url": "https://i.imgur.com/Hg8CwwU.jpeg",
+        "url": CLASSIC_BACK_IMAGE_URL,
         "alt": "default magic the gathering card back"
     }]
 
@@ -35,7 +35,7 @@ export default function CardBackSelection({ form, setForm, setCustomCardBackDisa
             <Grid item container style={{ "height": "10px" }}> </Grid>
 
             <Grid item container xs={11} direction="row" justifyContent="space-between">
-                <Grid> 
+                <Grid>
                     <TextField
                         id="cardback"
                         name="cardback"
@@ -58,10 +58,10 @@ export default function CardBackSelection({ form, setForm, setCustomCardBackDisa
                         variant="standard"
                         style={{ paddingRight: "10px", width: "auto" }}
                     />
-                    <Grid item container direction="row"> 
+                    <Grid item container direction="row">
                         {
                             preselectImages.map((image) => (
-                                <Card 
+                                <Card
                                     key={image.key}
                                     onClick={() => {
                                         setForm({ ...form, "cardback": image.url });
@@ -77,7 +77,7 @@ export default function CardBackSelection({ form, setForm, setCustomCardBackDisa
                                 </Card>
                             ))
                         }
-                       
+
                     </Grid>
                 </Grid>
                 <Card className={"CardBack"}>
