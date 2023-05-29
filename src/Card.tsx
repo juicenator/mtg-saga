@@ -1,8 +1,8 @@
 import { CardType, TabletopCard, TabletopObject } from './Tabletop';
 import { isValidHttpUrl } from './Utils';
 
-export const MTGSAGA_BACK_IMAGE_URL = require('./images/cardback-custom.png');
-export const CLASSIC_BACK_IMAGE_URL = require('./images/cardback-original.jpg');
+export const MTGSAGA_BACK_IMAGE_URL = window.location.origin + require('./images/cardback-custom.png');
+export const CLASSIC_BACK_IMAGE_URL = window.location.origin + require('./images/cardback-original.jpg');
 export const DEFAULT_CARD_BACK_IMAGE_URL = MTGSAGA_BACK_IMAGE_URL;
 
 let cardBack = DEFAULT_CARD_BACK_IMAGE_URL;
