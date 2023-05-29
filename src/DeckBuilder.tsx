@@ -178,14 +178,16 @@ async function download(form: any): Promise<string> {
     let hasAdditional = Object.keys(tokens).length > 0;
     let tabletopOutput = generateTabletopOutput(cards, hasAdditional, hasCommander, hasSideboard);
     let fileName = "";
+
     if (hasCommander) {
-        fileName = cards[commanderIndices[0]].name + ".json";
+        fileName = commanderIndices.map((index: number) => {
+            return cards[index].name;
+        }).join(" ⋅ ") + ".json";
     } else {
         fileName = cards[0].name + ".json";
     }
 
     downloadPrompt(fileName, tabletopOutput);
-    console.log(tabletopOutput);
     return DEFAULT_RESPONSE;
 }
 
