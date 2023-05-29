@@ -5,12 +5,18 @@ import { downloadPrompt } from './Utils';
 import { isValidHttpUrl } from './Utils';
 
 const DEFAULT_RESPONSE = "";
+const COMMANDER_INDICATORS = ["!Commander"];
 
-
-// Perhaps build in a delay here to prevent Scryfall from overloading.
-// Note: Since you already start the promises when you make them and not await them this is not the place to do it...
 async function performQueries(promises: any[]) {
     return Promise.all(promises);
+}
+
+function isLineEmpty(line: string) {
+    return line === "" || line.startsWith("//") || line.startsWith("#");
+}
+
+function cleanLine(line: string) {
+    return line.split("#")[0].trim();
 }
 
 async function download(form: any): Promise<string> {
@@ -25,14 +31,6 @@ async function download(form: any): Promise<string> {
     // multiline forms
     let decklistForm: string = form.decklist;
     let sideboardForm: string = form.sideboard;
-
-    // parsing helpers
-    function isLineEmpty(line: string) {
-        return line === "" || line.startsWith("//") || line.startsWith("#");
-    }
-    function cleanLine(line: string) {
-        return line.split("#")[0].trim();
-    }
 
     // keep track of cards and commanders
     let commanderIndices: number[] = [];
@@ -81,10 +79,12 @@ async function download(form: any): Promise<string> {
             }
         });
 
-        // process special commander flag
-        if (line.includes("!Commander")) {
-            isCommander = true;
-        }
+        // process special commander flags
+        COMMANDER_INDICATORS.forEach((indicator) => {
+            if (line.includes(indicator)) {
+                isCommander = true;
+            }
+        });
 
         cards.push(tmpCard);
         promises.push(tmpCard.getCardPromise());
