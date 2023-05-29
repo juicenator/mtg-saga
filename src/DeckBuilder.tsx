@@ -39,19 +39,10 @@ async function download(form: any): Promise<string> {
     let promises: any[] = [];
     let cards: Card[] = [];
 
+    // final checks
     if (commander === "" && decklistForm === "") {
         return DEFAULT_RESPONSE;
     }
-
-    const hasCommander = commander !== "";
-    const commanders = [commander]
-    if (partner !== "") {
-        commanders.push(partner)
-    }
-    const commanderToBeHandled = commanders
-        .filter((c: string) => { return c.trim() !== "" })
-        .map((c: string) => { return getName(c) });
-
     let hasSideboard = sideboardForm !== "";
 
     // start parsing
@@ -63,40 +54,43 @@ async function download(form: any): Promise<string> {
         decklist = await getDeckFromURL(decklist[0]);
     }
 
+    // Process but do not commit commanders
+    let commanders: Card[] = [];
+    [commander, partner].forEach((line: string, index: number) => {
+        if (isLineEmpty(line)) return;
+        let tmpCard = Card.fromLine(cleanLine(line));
+        tmpCard.setBackUrl(cardBack);
+        tmpCard.setCardType(CardType.Commander);
+        commanders.push(tmpCard);
+    });
+    let hasCommander = commanders.length > 0;
+
     // Build decklist with queries
     decklist.forEach((line: string, index: number) => {
         if (isLineEmpty(line)) return;
         let tmpCard = Card.fromLine(cleanLine(line));
         tmpCard.setBackUrl(cardBack);
 
-        if (commanderToBeHandled.length > 0) {
-            let isCommander = commanderToBeHandled.includes(getName(tmpCard.name));
-            if (isCommander) {
-                commanderToBeHandled.splice(commanderToBeHandled.indexOf(getName(tmpCard.name)), 1);
-                tmpCard.setCardType(CardType.Commander);
-                commanderIndices.push(index);
+        // replace processed commanders when relevant
+        commanders = commanders.filter((commander: Card) => {
+            if (commander.name !== tmpCard.name) {
+                return true;
             }
-        }
+            tmpCard.setCardType(CardType.Commander);
+            commanderIndices.push(index);
+            return false;
+        });
 
         cards.push(tmpCard);
         promises.push(tmpCard.getCardPromise());
     });
 
-    // Add commander if not present in main deck
-    if (commanderToBeHandled.length > 0) {
-        commanderToBeHandled.forEach((line) => {
-            if (line === "" || line.startsWith("//")) {
-                return;
-            }
-            line = line.trim();
-            let name = getName(line);
-            let tmpCard = new Card(name, 1, CardType.Commander);
-            tmpCard.setBackUrl(cardBack);
-            commanderIndices.push(cards.length);
-            cards.push(tmpCard);
-            promises.push(tmpCard.getCardPromise());
-        })
-    }
+    // Commit remaining commanders
+    commanders.forEach((commander: Card) => {
+        commanderIndices.push(cards.length);
+        cards.push(commander);
+        promises.push(commander.getCardPromise());
+    });
 
     // Parse sideboard
     sideboard.forEach((line: string, index: number) => {
