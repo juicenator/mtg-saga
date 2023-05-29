@@ -18,7 +18,7 @@ export function downloadPrompt(fileName: string, output: TabletopOutput) {
 }
 
 export function isValidHttpUrl(str: string): boolean {
-    return str.match(
+    return (
         /(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/g
-    ) !== null;
+    ).test(str);
 }
