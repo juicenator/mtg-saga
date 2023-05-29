@@ -57,10 +57,10 @@ async function download(form: any): Promise<string> {
 
     // Build decklist with queries
     decklist.forEach((line: string, index: number) => {
-        if (line === "" || line.startsWith("//")) {
+        if (line === "" || line.startsWith("//") || line.startsWith("#")) {
             return;
         }
-        let tmpCard = Card.fromLine(line.trim());
+        let tmpCard = Card.fromLine(line.split("#")[0].trim());
         tmpCard.setBackUrl(cardBack);
 
         if (commanderToBeHandled.length > 0) {
