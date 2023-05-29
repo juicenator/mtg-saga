@@ -11,17 +11,26 @@ import LaptopWindowsIcon from '@mui/icons-material/LaptopWindows';
 import download from './DeckBuilder';
 import useStyles from './Styles';
 
-import { isValidHttpUrl } from './Utils';
-
 import step1 from './images/step-1.svg' // relative path to image
 import step2 from './images/step-2.svg' // relative path to image
 import step3 from './images/step-3.svg' // relative path to image
-import { FormGroup, Switch, FormControlLabel, Tooltip, SvgIcon, Paper, CardMedia, Card } from '@mui/material';
+import { FormGroup, Switch, FormControlLabel, Tooltip, SvgIcon, Paper } from '@mui/material';
 import { DEFAULT_CARD_BACK_IMAGE_URL } from "./Card";
+import CardBackSelection from './CardBackSelection';
+
+export type FormType = {
+    commander: string;
+    partner: string;
+    decklist: string;
+    sideboard: string;
+    cardback: string;
+}
+
+export type SetFormType = React.Dispatch<React.SetStateAction<FormType>>
 
 export default function InfoForm() {
     const { classes } = useStyles();
-    const [form, setForm] = useState({ "commander": "", "partner": "", "decklist": "", "sideboard": "", "cardback": "" });
+    const [form, setForm]: [FormType, SetFormType] = useState({ "commander": "", "partner": "", "decklist": "", "sideboard": "", "cardback": "" });
 
     const [disabled, setDisabled] = useState(false);
     const [customCardBackDisabled, setCustomCardBackDisabled] = useState(false);
@@ -248,37 +257,7 @@ export default function InfoForm() {
 
                             {/* Custom card back */}
                             {customCardBackChecked ?
-                                <Grid item container xs={12}>
-                                    <Grid item container style={{ "height": "10px" }}> </Grid>
-
-                                    <Grid item container xs={11} direction="row" justifyContent="space-between">
-                                        <TextField
-                                            id="cardback"
-                                            name="cardback"
-                                            label="Custom Card Back"
-                                            value={form.cardback}
-                                            onChange={(e) => {
-                                                setForm({ ...form, "cardback": e.target.value })
-                                                // test if correct url, if so, set download on OK
-                                                if (!isValidHttpUrl(e.target.value)) {
-                                                    setCustomCardBackDisabled(true);
-                                                } else {
-                                                    setCustomCardBackDisabled(false);
-                                                }
-                                            }}
-                                            InputLabelProps={{ shrink: true }}
-                                            placeholder={DEFAULT_CARD_BACK_IMAGE_URL}
-                                            helperText="Paste a URL to a card image with a ratio of 488 × 680"
-                                            fullWidth
-                                            variant="standard"
-                                            style={{ paddingRight: "10px", width: "auto" }}
-                                        />
-                                        <Card className={"CardBack"}>
-                                            <CardMedia image={form.cardback} className={"CardBack"}>
-                                            </CardMedia>
-                                        </Card>
-                                    </Grid>
-                                </Grid>
+                                <CardBackSelection form={form} setForm={setForm} setCustomCardBackDisabled={setCustomCardBackDisabled}/>
                                 : null}
                         </Grid>
                     </Grid>
