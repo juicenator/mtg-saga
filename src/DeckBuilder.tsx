@@ -1,27 +1,33 @@
-import Card, {DEFAULT_CARD_BACK_IMAGE_URL} from './Card';
+import Card, { DEFAULT_CARD_BACK_IMAGE_URL } from './Card';
 import { CardType, generateTabletopOutput } from './Tabletop';
 import { getDeckFromURL } from './DeckURL';
-import { getName, getNumInstances, downloadPrompt } from './Utils';
+import { downloadPrompt } from './Utils';
 import { isValidHttpUrl } from './Utils';
 
 const DEFAULT_RESPONSE = "";
+const COMMANDER_INDICATORS = ["!Commander"];
 
-
-// Perhaps build in a delay here to prevent Scryfall from overloading.
-// Note: Since you already start the promises when you make them and not await them this is not the place to do it...
 async function performQueries(promises: any[]) {
     return Promise.all(promises);
+}
+
+function isLineEmpty(line: string) {
+    return line === "" || line.startsWith("//") || line.startsWith("#");
+}
+
+function cleanLine(line: string) {
+    return line.split("#")[0].trim();
 }
 
 async function download(form: any): Promise<string> {
     // single forms
     let commander: string = form.commander;
     let partner: string = form.partner;
-    let cardBack: string = form.cardback.trim(); 
+    let cardBack: string = form.cardback.trim();
     if (!isValidHttpUrl(cardBack)) {
         cardBack = DEFAULT_CARD_BACK_IMAGE_URL;
     }
-    
+
     // multiline forms
     let decklistForm: string = form.decklist;
     let sideboardForm: string = form.sideboard;
@@ -30,22 +36,14 @@ async function download(form: any): Promise<string> {
     let commanderIndices: number[] = [];
     let promises: any[] = [];
     let cards: Card[] = [];
+    let commandersFromForm: Card[] = [];
 
+    // final checks
     if (commander === "" && decklistForm === "") {
         return DEFAULT_RESPONSE;
     }
-
-    const hasCommander = commander !== "";
-    const commanders = [commander]
-    if (partner !== "") {
-        commanders.push(partner)
-    }
-    const commanderToBeHandled = commanders
-        .filter((c: string) => { return c.trim() !== "" })
-        .map((c: string) => { return getName(c) });
-    
     let hasSideboard = sideboardForm !== "";
-    
+
     // start parsing
     let decklist: string[] = decklistForm.split("\n");
     let sideboard: string[] = sideboardForm.split("\n");
@@ -55,52 +53,62 @@ async function download(form: any): Promise<string> {
         decklist = await getDeckFromURL(decklist[0]);
     }
 
-    // Build decklist with queries
-    decklist.forEach((line: string, index: number) => {
-        if (line === "" || line.startsWith("//")) {
-            return;
-        }
-        let tmpCard = Card.fromLine(line.trim());
+    // Process but do not commit commanders
+    [commander, partner].forEach((line: string, index: number) => {
+        if (isLineEmpty(line)) return;
+        let tmpCard = Card.fromLine(cleanLine(line));
         tmpCard.setBackUrl(cardBack);
-
-        if (commanderToBeHandled.length > 0) {
-            let isCommander = commanderToBeHandled.includes(getName(tmpCard.name));
-            if (isCommander) {
-                commanderToBeHandled.splice(commanderToBeHandled.indexOf(getName(tmpCard.name)), 1);
-                tmpCard.setCardType(CardType.Commander);
-                commanderIndices.push(index);
-            }
-        }
-        cards.push(tmpCard);
-        promises.push(tmpCard.getCardPromise());
+        tmpCard.setCardType(CardType.Commander);
+        commandersFromForm.push(tmpCard);
     });
 
-    // Add commander if not present in main deck
-    if (commanderToBeHandled.length > 0) {
-        commanderToBeHandled.forEach((line) => {
-            if (line === "" || line.startsWith("//")) {
-                return;
+    // Build decklist with queries
+    decklist.forEach((line: string, index: number) => {
+        if (isLineEmpty(line)) return;
+        let tmpCard = Card.fromLine(cleanLine(line));
+        tmpCard.setBackUrl(cardBack);
+        let isCommander = false;
+
+        // replace processed commanders when relevant
+        commandersFromForm = commandersFromForm.filter((commander: Card) => {
+            if (commander.name !== tmpCard.name) {
+                return true;
+            } else {
+                isCommander = true;
+                return false;
             }
-            line = line.trim();
-            let name = getName(line);
-            let tmpCard = new Card(name, 1, CardType.Commander);
-            tmpCard.setBackUrl(cardBack);
-            commanderIndices.push(cards.length);
-            cards.push(tmpCard);
-            promises.push(tmpCard.getCardPromise());
-        })
-    }
+        });
+
+        // process special commander flags
+        for (const indicator of COMMANDER_INDICATORS) {
+            if (line.includes(indicator)) {
+                isCommander = true;
+                break;
+            }
+        }
+
+        cards.push(tmpCard);
+        promises.push(tmpCard.getCardPromise());
+        if (isCommander) {
+            tmpCard.setCardType(CardType.Commander);
+            commanderIndices.push(index);
+        }
+    });
+
+    // Commit remaining commanders
+    commandersFromForm.forEach((commander: Card) => {
+        cards.push(commander);
+        promises.push(commander.getCardPromise());
+        commanderIndices.push(cards.length);
+    });
 
     // Parse sideboard
     sideboard.forEach((line: string, index: number) => {
-        if (line === "" || line.startsWith("//")) {
-            return;
-        }
-        line = line.trim();
-        let numInstances = getNumInstances(line);
-        let name = getName(line);
-        let tmpCard = new Card(name, numInstances, CardType.Sideboard);
+        if (isLineEmpty(line)) return;
+        let tmpCard = Card.fromLine(cleanLine(line));
         tmpCard.setBackUrl(cardBack);
+        tmpCard.setCardType(CardType.Sideboard);
+
         cards.push(tmpCard);
         promises.push(tmpCard.getCardPromise());
     });
@@ -166,17 +174,20 @@ async function download(form: any): Promise<string> {
     }
 
     // Build JSON structure
+    let hasCommander = commanderIndices.length > 0;
     let hasAdditional = Object.keys(tokens).length > 0;
     let tabletopOutput = generateTabletopOutput(cards, hasAdditional, hasCommander, hasSideboard);
     let fileName = "";
+
     if (hasCommander) {
-        fileName = cards[commanderIndices[0]].name + ".json";
+        fileName = commanderIndices.map((index: number) => {
+            return cards[index].name;
+        }).join(" ⋅ ") + ".json";
     } else {
         fileName = cards[0].name + ".json";
     }
-    
+
     downloadPrompt(fileName, tabletopOutput);
-    console.log(tabletopOutput);
     return DEFAULT_RESPONSE;
 }
 
